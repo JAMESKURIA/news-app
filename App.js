@@ -1,20 +1,22 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+// import { StatusBar } from "expo-status-bar";
+import { NavigationContainer } from "@react-navigation/native";
+import { SafeAreaProvider } from "react-native-safe-area-context";
+import tw from "tailwind-react-native-classnames";
+import { AuthStack, MainTabs } from "./src/navigation";
+import { ApolloClientProvider } from "./src/providers";
 
 export default function App() {
   return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
+    <>
+      <NavigationContainer>
+        <ApolloClientProvider>
+          <SafeAreaProvider style={tw`flex-1`}>
+            {/* <StatusBar style="auto" /> */}
+            {/* <AuthStack /> */}
+            <MainTabs />
+          </SafeAreaProvider>
+        </ApolloClientProvider>
+      </NavigationContainer>
+    </>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
