@@ -1,6 +1,8 @@
-export const COLORS = {
-  // Dark
+const COLORS = {
+  // DARK
   color_dark_dark: "#e51324",
+  color_dark_light: "#333",
+  color_dark_accent: "#ccc",
 
   // Primary
   color_primary_dark: "#e2eac4",
@@ -14,3 +16,5 @@ export const COLORS = {
   // Accent
   color_accent_dark: "#d4d0aa",
 };
+
+export default COLORS;
