@@ -1,23 +1,17 @@
-import {
-  View,
-  Text,
-  Dimensions,
-  TouchableOpacity,
-  ScrollView,
-} from "react-native";
 import React from "react";
-
-import tw from "tailwind-react-native-classnames";
-import RNBounceable from "@freakycoder/react-native-bounceable";
-
-import { TextField } from "rn-material-ui-textfield";
-
-import { Button, Loading } from "../../components";
-
+import {
+  Dimensions,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import Icon from "react-native-dynamic-vector-icons";
-
-import { COLORS } from "../../resources/theme";
+import { TextField } from "rn-material-ui-textfield";
+import tw from "tailwind-react-native-classnames";
+import { Button } from "../../components";
 import { LoginSVG } from "../../svg";
+
 // import useAuth from "../../hooks/useAuth";
 const { width, height } = Dimensions.get("screen");
 
@@ -108,7 +102,7 @@ const Login = ({ navigation }) => {
                 type="MaterialIcons"
                 name="email"
                 size={20}
-                color={COLORS.color_dark_dark}
+                // color={COLORS?.color_dark_dark}
                 style={tw`mr-2`}
               />
             )}
@@ -131,18 +125,18 @@ const Login = ({ navigation }) => {
                 type="FontAwesome5"
                 name="lock"
                 size={20}
-                color={COLORS.color_dark_dark}
+                // color={COLORS?.color_dark_dark}
                 style={tw`mr-2`}
               />
             )}
           />
 
           {/* Forgot password link */}
-          <TouchableOpacity>
+          <TouchableOpacity style={tw`py-3 `}>
             <Text
               style={[
                 tw`text-right pr-2 font-bold text-sm`,
-                { color: COLORS.color_accent_dark },
+                // { color: COLORS?.color_accent_dark },
               ]}
             >
               Forgot password?
@@ -151,11 +145,12 @@ const Login = ({ navigation }) => {
         </View>
 
         {/* Login button */}
-        <View style={[tw`py-4 self-center`, { width: width / 1.4 }]}>
+        <View style={[tw`py-10 self-center`, { width: width / 1.4 }]}>
           <Button
             text="login"
-            color={COLORS.color_dark_dark}
+            // color={COLORS?.color_dark_dark}
             rounded="true"
+            style={tw`bg-gray-200 rounded-full px-20`}
             // onClick={signIn}
           />
         </View>
@@ -167,7 +162,12 @@ const Login = ({ navigation }) => {
             style={tw`self-end -ml-4`}
             onPress={() => navigation.navigate("Register")}
           >
-            <Text style={[tw`font-bold`, { color: COLORS.color_accent_dark }]}>
+            <Text
+              style={[
+                tw`font-bold`,
+                // { color: COLORS?.color_accent_dark }
+              ]}
+            >
               Sign Up
             </Text>
           </TouchableOpacity>

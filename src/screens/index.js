@@ -11,4 +11,5 @@ export { default as MediaProfile } from "./media/MediaProfile";
 export { default as SubmittedNews } from "./media/SubmittedNews";
 // Shared
 export { default as Profile } from "./shared/Profile";
+export { default as Settings } from "./shared/Settings";
 export { default as SingleNews } from "./shared/SingleNews";

@@ -1,28 +1,20 @@
-import {
-  View,
-  Text,
-  Dimensions,
-  ScrollView,
-  TouchableOpacity,
-  Image,
-  Platform,
-  Alert,
-} from "react-native";
-import React from "react";
-import { TextField } from "rn-material-ui-textfield";
-import * as ImagePicker from "expo-image-picker";
-
-import { Button, Loading } from "../../components";
-
-import Icon from "react-native-dynamic-vector-icons";
-
-import tw from "tailwind-react-native-classnames";
-
 //   import useAuth from "../../hooks/useAuth";
 //   import useStorage from "../../hooks/useStorage";
-
 import { gql, useMutation } from "@apollo/client";
-import { COLORS } from "../../resources/theme";
+import * as ImagePicker from "expo-image-picker";
+import React from "react";
+import {
+  Alert,
+  Dimensions,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import Icon from "react-native-dynamic-vector-icons";
+import { TextField } from "rn-material-ui-textfield";
+import tw from "tailwind-react-native-classnames";
+import { Button, Loading } from "../../components";
 
 const INSERT_USER = gql`
   mutation insertUser(
@@ -172,7 +164,7 @@ const Register = ({ navigation }) => {
     <ScrollView showsVerticalScrollIndicator={false}>
       <View style={tw`flex-1 p-4`}>
         {/* Create Account */}
-        <View style={tw`px-4 mb-20`}>
+        {/* <View style={tw`px-4 mb-20`}>
           <Text
             style={[
               tw`font-bold text-2xl text-center`,
@@ -193,13 +185,13 @@ const Register = ({ navigation }) => {
               color={COLORS.color_dark_dark}
             />
           </TouchableOpacity>
-        </View>
+        </View> */}
 
         {/* Image */}
         {/* <View
           style={[
             tw`self-center h-28 w-28 items-center justify-center rounded-full my-4 border border-white`,
-            { backgroundColor: COLORS.color_primary_dark },
+            // { backgroundColor: COLORS.color_primary_dark },
           ]}
         >
           {!image ? (
@@ -209,12 +201,14 @@ const Register = ({ navigation }) => {
                 name="ios-person"
                 size={90}
                 color={COLORS.color_light_dark}
+      
+                style={tw`text-gray-900`}
               />
 
               <TouchableOpacity
                 style={[
                   tw`h-10 w-10 absolute -bottom-1 -right-2 rounded-full items-center justify-center border border-white`,
-                  { backgroundColor: COLORS.color_primary_dark },
+                  // { backgroundColor: COLORS.color_primary_dark },
                 ]}
                 onPress={pickImage}
               >
@@ -222,7 +216,8 @@ const Register = ({ navigation }) => {
                   type="Ionicons"
                   name="camera"
                   size={24}
-                  color={COLORS.color_dark_dark}
+                  style={tw`text-gray-900`}
+                  // color={COLORS.color_dark_dark}
                 />
               </TouchableOpacity>
             </View>
@@ -250,6 +245,9 @@ const Register = ({ navigation }) => {
           )}
         </View> */}
 
+        <View style={tw`py-10`}>
+          <Text style={tw`text-center text-xl`}>Create an Account</Text>
+        </View>
         {/* First Name */}
         <TextField
           label="First Name"
@@ -262,8 +260,9 @@ const Register = ({ navigation }) => {
               type="Ionicons"
               name="person"
               size={20}
-              color={COLORS.color_light_dark}
-              style={tw`mr-2`}
+              // color={COLORS.color_light_dark}
+
+              style={tw`mr-2 text-gray-900`}
             />
           )}
         />
@@ -280,8 +279,9 @@ const Register = ({ navigation }) => {
               type="Ionicons"
               name="person"
               size={20}
-              color={COLORS.color_light_dark}
-              style={tw`mr-2`}
+              // color={COLORS.color_light_dark}
+
+              style={tw`mr-2  text-gray-900`}
             />
           )}
         />
@@ -303,8 +303,9 @@ const Register = ({ navigation }) => {
               type="MaterialIcons"
               name="email"
               size={20}
-              color={COLORS.color_light_dark}
-              style={tw`mr-2`}
+              // color={COLORS.color_light_dark}
+
+              style={tw`mr-2 text-gray-900`}
             />
           )}
         />
@@ -321,8 +322,9 @@ const Register = ({ navigation }) => {
               type="FontAwesome5"
               name="phone-alt"
               size={20}
-              color={COLORS.color_light_dark}
-              style={tw`mr-2`}
+              // color={COLORS.color_light_dark}
+
+              style={tw`mr-2 text-gray-900`}
             />
           )}
         />
@@ -352,8 +354,9 @@ const Register = ({ navigation }) => {
               type="FontAwesome5"
               name="lock"
               size={20}
-              color={COLORS.color_light_dark}
-              style={tw`mr-2`}
+              // color={COLORS.color_light_dark}
+
+              style={tw`mr-2 text-gray-900`}
             />
           )}
 
@@ -380,8 +383,9 @@ const Register = ({ navigation }) => {
               type="FontAwesome5"
               name="lock"
               size={20}
-              color={COLORS.color_light_dark}
-              style={tw`mr-2`}
+              // color={COLORS.color_light_dark}
+
+              style={tw`mr-2 text-gray-900`}
             />
           )}
         />
@@ -390,7 +394,8 @@ const Register = ({ navigation }) => {
         <View style={[tw`py-4 self-center`, { width: width / 1.4 }]}>
           <Button
             text="Register"
-            color={COLORS.color_light_dark}
+            // color={COLORS.color_light_dark}
+            style={tw`bg-gray-200 rounded-full px-20`}
             rounded="true"
             //   onClick={signUp}
           />
@@ -399,7 +404,10 @@ const Register = ({ navigation }) => {
         {/* Already have an account login link*/}
         <View style={tw`flex-row items-center self-center pb-4`}>
           <Text
-            style={[tw`px-6 text-center`, { color: COLORS.color_dark_dark }]}
+            style={[
+              tw`px-6 text-center`,
+              //  { color: COLORS.color_dark_dark }
+            ]}
           >
             Already have an account?
           </Text>
@@ -408,7 +416,12 @@ const Register = ({ navigation }) => {
             style={tw`self-end -ml-4`}
             onPress={() => navigation.navigate("Login")}
           >
-            <Text style={[tw`font-bold`, { color: COLORS.color_primary_dark }]}>
+            <Text
+              style={[
+                tw`font-bold`,
+                // { color: COLORS.color_primary_dark }
+              ]}
+            >
               Sign in
             </Text>
           </TouchableOpacity>

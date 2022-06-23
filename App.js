@@ -4,12 +4,13 @@ import { KeyboardAvoidingView, LogBox } from "react-native";
 import { MenuProvider } from "react-native-popup-menu";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import tw from "tailwind-react-native-classnames";
-import { CustomerTabs } from "./src/navigation";
+import { MediaTabs } from "./src/navigation";
 import { ApolloClientProvider } from "./src/providers";
 import { COLORS } from "./src/resources";
 
 export default function App() {
   LogBox.ignoreAllLogs(true);
+
   return (
     <>
       <NavigationContainer>
@@ -22,8 +23,8 @@ export default function App() {
                   backgroundColor={COLORS.color_light_dark}
                 />
                 {/* <AuthStack /> */}
-                {/* <MediaTabs /> */}
-                <CustomerTabs />
+                <MediaTabs />
+                {/* <CustomerTabs /> */}
               </MenuProvider>
             </KeyboardAvoidingView>
           </SafeAreaProvider>

@@ -2,7 +2,8 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import React from "react";
 import Icon from "react-native-dynamic-vector-icons";
 import { COLORS } from "../../resources";
-import { HomeScreen, MediaProfile } from "../../screens";
+import { MediaProfile } from "../../screens";
+import MediaAccountStack from "../stacks/MediaAccountStack";
 
 const Tab = createBottomTabNavigator();
 
@@ -23,7 +24,7 @@ const MediaTabs = () => {
     >
       <Tab.Screen
         name="Home"
-        component={HomeScreen}
+        component={MediaProfile}
         options={{
           tabBarIcon: ({ focused, color, size }) => (
             <Icon
@@ -40,7 +41,7 @@ const MediaTabs = () => {
       />
       <Tab.Screen
         name="Account"
-        component={MediaProfile}
+        component={MediaAccountStack}
         options={{
           tabBarIcon: ({ focused, color, size }) => (
             <Icon
