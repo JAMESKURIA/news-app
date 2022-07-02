@@ -1,7 +1,4 @@
-//   import useAuth from "../../hooks/useAuth";
-//   import useStorage from "../../hooks/useStorage";
 import { gql, useMutation } from "@apollo/client";
-import * as ImagePicker from "expo-image-picker";
 import React from "react";
 import {
   Alert,
@@ -11,149 +8,116 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import Icon from "react-native-dynamic-vector-icons";
 import { TextField } from "rn-material-ui-textfield";
 import tw from "tailwind-react-native-classnames";
 import { Button, Loading } from "../../components";
+import useAuth from "../../hooks/useAuth";
+
+const { width } = Dimensions.get("screen");
 
 const INSERT_USER = gql`
-  mutation insertUser(
+  mutation createUser(
     $loginId: String!
-    $email: String!
     $password: String!
     $rank: String
-    $fname: String
-    $lname: String
-    $contact: String
-    $image: String
+    $username: String
+    $email: String
+    $name: String
+    $phone: String
   ) {
-    insert_login(
-      objects: {
+    insert_login_one(
+      object: {
         login_id: $loginId
-        login_email: $email
         login_password: $password
         login_rank: $rank
-        users: {
+        login_username: $username
+        customers: {
           data: {
-            user_contact: $contact
-            user_fname: $fname
-            user_image: $image
-            user_lname: $lname
+            customer_email: $email
+            customer_name: $name
+            cutomer_phoneNumber: $phone
           }
         }
       }
     ) {
-      affected_rows
+      customers {
+        customer_id
+      }
     }
   }
 `;
 
-const { width } = Dimensions.get("screen");
-
 const Register = ({ navigation }) => {
-  //   const { signup, signout } = useAuth();
-  //   const uploadFile = useStorage();
+  const { signup, signout } = useAuth();
 
   const [
-    insertUser,
+    createUser,
     { loading: userLoading, error: userError, data: userData },
   ] = useMutation(INSERT_USER);
 
-  const [image, setImage] = React.useState(null);
   const [fname, setFname] = React.useState(null);
   const [lname, setLname] = React.useState(null);
+  const [username, setUsername] = React.useState(null);
   const [email, setEmail] = React.useState(null);
   const [phone, setPhone] = React.useState(null);
   const [password, setPassword] = React.useState(null);
-  const [rank, setRank] = React.useState(null);
   const [errors, setErrors] = React.useState({});
   const [loading, setLoading] = React.useState(false);
 
-  // Pick an image
-  const pickImage = async () => {
-    // No permissions request is necessary for launching the image library
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      aspect: [3, 3],
-      quality: 1,
-    });
-
-    if (!result.cancelled) {
-      setImage(result);
-
-      // console.log(result);
-    }
-  };
-
   // Create user with email and password
   const signUp = async () => {
-    let id = "";
+    // console.log("Register clicked");
+    let loginId;
+    if (!username || !fname || !lname || !email || !phone || !password) {
+      Alert.alert("Warning", "Please fill in all the fields!");
+    }
+
     try {
       setLoading(true);
 
       const result = await signup(email.toLowerCase().trim(), password);
 
-      const { uid, email: _email } = result;
+      const { uid, email: _email } = await result;
 
-      id = uid;
-
-      console.log("Firebase: Created user!");
-
-      // Upload user profile pic, then
-
-      await uploadFile(image, (file) => {
-        // set image based on firstname
-        if (!file) {
-          file = {
-            uri: `https://ui-avatars.com/api/?name=${fname}+${lname}`,
-            fileType: "image",
-          };
-        }
-        console.log(`Uploaded file!`);
-        // SAVE USER TO DB
-        insertUser({
-          variables: {
-            loginId: id,
-            email: email,
-            password: " . ",
-            rank: rank,
-            fname: fname,
-            lname: lname,
-            contact: phone,
-            image: file.uri,
-          },
-        });
-
-        // errors
-        if (userError) {
-          console.log("Error inserting into users: ", userError);
-          Alert.alert("ERROR", "Error adding user :(");
-        }
-
-        if (!userError && !userLoading) {
-          console.log("Hasura: Created user successfully :)");
-
-          setLoading(false);
-
-          Alert.alert("Success!", "Succesfully registered, you can now login");
-          signout(() => navigation.navigate("Login"));
-        }
-      });
+      if (uid) {
+        loginId = uid;
+      }
     } catch (error) {
-      console.log("Error: ", JSON.stringify(error));
+      // console.log("Error: ", JSON.stringify(error));
       setLoading(false);
 
       if (error?.code == "auth/email-already-in-use") {
         setErrors({ ...errors, emailError: "Email already in use!" });
       }
 
-      // invlaid email
+      // invalid email
       if (error?.code?.includes("auth/invalid-email")) {
         setErrors({ ...errors, emailError: "Invalid email!" });
       }
+    } finally {
+      if (loginId) {
+        createUser({
+          variables: {
+            password: "-----",
+            rank: "customer",
+            username,
+            email,
+            phone,
+            name: `${fname} ${lname}`,
+            loginId,
+          },
+        });
+
+        Alert.alert("Success!", "Succesfully registered, you can now login");
+        await signout(() => navigation.navigate("Login"));
+      }
+      setLoading(false);
     }
   };
+
+  if (userError) {
+    console.log("Hasura Error: ", userError);
+  }
 
   // Show loader
   if (loading || userLoading) {
@@ -163,91 +127,19 @@ const Register = ({ navigation }) => {
   return (
     <ScrollView showsVerticalScrollIndicator={false}>
       <View style={tw`flex-1 p-4`}>
-        {/* Create Account */}
-        {/* <View style={tw`px-4 mb-20`}>
-          <Text
-            style={[
-              tw`font-bold text-2xl text-center`,
-              { color: COLORS.color_dark_dark },
-            ]}
-          >
-            Create Account
-          </Text>
-
-          <TouchableOpacity
-            style={tw`absolute top-1 left-0`}
-            onPress={() => navigation.goBack()}
-          >
-            <Icon
-              type="AntDesign"
-              name="arrowleft"
-              size={24}
-              color={COLORS.color_dark_dark}
-            />
-          </TouchableOpacity>
-        </View> */}
-
-        {/* Image */}
-        {/* <View
-          style={[
-            tw`self-center h-28 w-28 items-center justify-center rounded-full my-4 border border-white`,
-            // { backgroundColor: COLORS.color_primary_dark },
-          ]}
-        >
-          {!image ? (
-            <View>
-              <Icon
-                type="Ionicons"
-                name="ios-person"
-                size={90}
-                color={COLORS.color_light_dark}
-      
-                style={tw`text-gray-900`}
-              />
-
-              <TouchableOpacity
-                style={[
-                  tw`h-10 w-10 absolute -bottom-1 -right-2 rounded-full items-center justify-center border border-white`,
-                  // { backgroundColor: COLORS.color_primary_dark },
-                ]}
-                onPress={pickImage}
-              >
-                <Icon
-                  type="Ionicons"
-                  name="camera"
-                  size={24}
-                  style={tw`text-gray-900`}
-                  // color={COLORS.color_dark_dark}
-                />
-              </TouchableOpacity>
-            </View>
-          ) : (
-            <>
-              <Image
-                source={{ uri: image.uri }}
-                style={tw`w-full h-full rounded-full`}
-              />
-              <TouchableOpacity
-                style={[
-                  tw`h-10 w-10 absolute -bottom-1 -right-2 rounded-full items-center justify-center border border-white`,
-                  { backgroundColor: COLORS.color_primary_dark },
-                ]}
-                onPress={pickImage}
-              >
-                <Icon
-                  type="Ionicons"
-                  name="camera"
-                  size={24}
-                  color={COLORS.color_dark_dark}
-                />
-              </TouchableOpacity>
-            </>
-          )}
-        </View> */}
-
-        <View style={tw`py-10`}>
+        <View style={tw`pt-4 pb-5`}>
           <Text style={tw`text-center text-xl`}>Create an Account</Text>
         </View>
+
+        {/* Username */}
+        <TextField
+          label="Username"
+          keyboardType="default"
+          multiline={false}
+          onChangeText={(text) => setUsername(text)}
+          value={username}
+        />
+
         {/* First Name */}
         <TextField
           label="First Name"
@@ -255,16 +147,6 @@ const Register = ({ navigation }) => {
           multiline={false}
           onChangeText={(text) => setFname(text)}
           value={fname}
-          renderLeftAccessory={() => (
-            <Icon
-              type="Ionicons"
-              name="person"
-              size={20}
-              // color={COLORS.color_light_dark}
-
-              style={tw`mr-2 text-gray-900`}
-            />
-          )}
         />
 
         {/* Last Name */}
@@ -274,16 +156,6 @@ const Register = ({ navigation }) => {
           multiline={false}
           onChangeText={(text) => setLname(text)}
           value={lname}
-          renderLeftAccessory={() => (
-            <Icon
-              type="Ionicons"
-              name="person"
-              size={20}
-              // color={COLORS.color_light_dark}
-
-              style={tw`mr-2  text-gray-900`}
-            />
-          )}
         />
 
         {/* Email*/}
@@ -298,16 +170,6 @@ const Register = ({ navigation }) => {
           }}
           value={email}
           error={errors.emailError}
-          renderLeftAccessory={() => (
-            <Icon
-              type="MaterialIcons"
-              name="email"
-              size={20}
-              // color={COLORS.color_light_dark}
-
-              style={tw`mr-2 text-gray-900`}
-            />
-          )}
         />
 
         {/* Mobile */}
@@ -317,16 +179,6 @@ const Register = ({ navigation }) => {
           multiline={false}
           onChangeText={(text) => setPhone(text)}
           value={phone}
-          renderLeftAccessory={() => (
-            <Icon
-              type="FontAwesome5"
-              name="phone-alt"
-              size={20}
-              // color={COLORS.color_light_dark}
-
-              style={tw`mr-2 text-gray-900`}
-            />
-          )}
         />
 
         {/* Password */}
@@ -349,18 +201,6 @@ const Register = ({ navigation }) => {
           }}
           secureTextEntry
           error={errors.passLength}
-          renderLeftAccessory={() => (
-            <Icon
-              type="FontAwesome5"
-              name="lock"
-              size={20}
-              // color={COLORS.color_light_dark}
-
-              style={tw`mr-2 text-gray-900`}
-            />
-          )}
-
-          // TODO: Add eye to show password
         />
 
         {/* Confirm Password */}
@@ -378,16 +218,6 @@ const Register = ({ navigation }) => {
           }}
           error={errors.passMatch}
           secureTextEntry
-          renderLeftAccessory={() => (
-            <Icon
-              type="FontAwesome5"
-              name="lock"
-              size={20}
-              // color={COLORS.color_light_dark}
-
-              style={tw`mr-2 text-gray-900`}
-            />
-          )}
         />
 
         {/* Register button */}
@@ -397,7 +227,7 @@ const Register = ({ navigation }) => {
             // color={COLORS.color_light_dark}
             style={tw`bg-gray-200 rounded-full px-20`}
             rounded="true"
-            //   onClick={signUp}
+            onPress={signUp}
           />
         </View>
 

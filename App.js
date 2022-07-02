@@ -4,8 +4,7 @@ import { KeyboardAvoidingView, LogBox } from "react-native";
 import { MenuProvider } from "react-native-popup-menu";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import tw from "tailwind-react-native-classnames";
-import { MediaTabs } from "./src/navigation";
-import { ApolloClientProvider } from "./src/providers";
+import { ApolloClientProvider, Providers } from "./src/providers";
 import { COLORS } from "./src/resources";
 
 export default function App() {
@@ -22,9 +21,7 @@ export default function App() {
                   style="auto"
                   backgroundColor={COLORS.color_light_dark}
                 />
-                {/* <AuthStack /> */}
-                <MediaTabs />
-                {/* <CustomerTabs /> */}
+                <Providers />
               </MenuProvider>
             </KeyboardAvoidingView>
           </SafeAreaProvider>

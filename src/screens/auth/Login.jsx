@@ -6,86 +6,88 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import Icon from "react-native-dynamic-vector-icons";
 import { TextField } from "rn-material-ui-textfield";
 import tw from "tailwind-react-native-classnames";
-import { Button } from "../../components";
+import { Button, Loading } from "../../components";
+import useAuth from "../../hooks/useAuth";
 import { LoginSVG } from "../../svg";
-
-// import useAuth from "../../hooks/useAuth";
 const { width, height } = Dimensions.get("screen");
 
 const Login = ({ navigation }) => {
-  // const auth = useAuth();
+  const { signin } = useAuth();
   const [email, setEmail] = React.useState(null);
   const [password, setPassword] = React.useState(null);
   const [loading, setLoading] = React.useState(false);
   const [errors, setErrors] = React.useState({});
 
-  // // Create user with email and password
-  // const signIn = async () => {
-  //   // empty email
-  //   if (!email) {
-  //     setErrors({ ...errors, emailError: "Please fill in this field!" });
-  //   }
+  // Create user with email and password
+  const signIn = async () => {
+    // empty email
+    if (!email) {
+      setErrors({ ...errors, emailError: "Please fill in this field!" });
+    }
 
-  //   // empty email
-  //   if (!password) {
-  //     setErrors({ ...errors, passError: "Please fill in this field!" });
-  //   }
-  //   try {
-  //     setLoading(true);
+    // empty password
+    if (!password) {
+      setErrors({ ...errors, passError: "Please fill in this field!" });
+    }
 
-  //     await auth.signin(email.toLowerCase().trim(), password);
+    try {
+      setLoading(true);
 
-  //     setLoading(false);
-  //   } catch (error) {
-  //     setLoading(false);
+      // console.log("EMAIL: ", email);
+      // console.log("password: ", password);
 
-  //     // console.log(JSON.stringify(error));
+      await signin(email.toLowerCase().trim(), password);
 
-  //     // wrong password
-  //     if (error.code.includes("wrong-password")) {
-  //       setErrors({ ...errors, passError: "Wrong password" });
-  //       return;
-  //     }
+      setLoading(false);
+    } catch (error) {
+      setLoading(false);
 
-  //     // invlaid email
-  //     if (error.code.includes("invalid-email")) {
-  //       setErrors({ ...errors, emailError: "Invalid email!" });
-  //       return;
-  //     }
+      console.log("Error Occured Here: ", JSON.stringify(error));
 
-  //     // inexistent email
-  //     if (error.code.includes("user-not-found")) {
-  //       setErrors({ ...errors, emailError: "User not found!" });
-  //       return;
-  //     }
-  //   }
-  // };
+      // wrong password
+      if (error.code.includes("wrong-password")) {
+        setErrors({ ...errors, passError: "Wrong password" });
+        return;
+      }
 
-  // // Show loader
-  // if (loading) {
-  //   return <Loading />;
-  // }
+      // invlaid email
+      if (error.code.includes("invalid-email")) {
+        setErrors({ ...errors, emailError: "Invalid email!" });
+        return;
+      }
+
+      // inexistent email
+      if (error.code.includes("user-not-found")) {
+        setErrors({ ...errors, emailError: "User not found!" });
+        return;
+      }
+    }
+  };
+
+  // Show loader
+  if (loading) {
+    return <Loading />;
+  }
 
   return (
     <ScrollView
       style={tw`flex-1 bg-white`}
       showsVerticalScrollIndicator={false}
     >
-      <View style={tw`flex-1 pt-4 bg-white`}>
+      <View style={tw`flex-1 pt-12 bg-white`}>
         <LoginSVG height={height / 3} width={width} />
 
-        <Text style={tw`text-center text-xl font-bold pt-1`}>
+        <Text style={tw`text-center text-xl font-bold pt-5`}>
           Welcome Back!
         </Text>
-        <Text style={tw`text-center text-sm font-semibold `}>
+        {/* <Text style={tw`text-center text-sm font-semibold `}>
           Login in to your account
-        </Text>
+        </Text> */}
 
         {/* Inputs */}
-        <View style={tw`pt-1 px-6`}>
+        <View style={tw`pt-4 px-6`}>
           {/* Email */}
           <TextField
             label="Email"
@@ -97,15 +99,6 @@ const Login = ({ navigation }) => {
             }}
             error={errors.emailError}
             value={email}
-            renderLeftAccessory={() => (
-              <Icon
-                type="MaterialIcons"
-                name="email"
-                size={20}
-                // color={COLORS?.color_dark_dark}
-                style={tw`mr-2`}
-              />
-            )}
           />
 
           {/* Password */}
@@ -120,38 +113,16 @@ const Login = ({ navigation }) => {
             value={password}
             error={errors.passError}
             secureTextEntry
-            renderLeftAccessory={() => (
-              <Icon
-                type="FontAwesome5"
-                name="lock"
-                size={20}
-                // color={COLORS?.color_dark_dark}
-                style={tw`mr-2`}
-              />
-            )}
           />
-
-          {/* Forgot password link */}
-          <TouchableOpacity style={tw`py-3 `}>
-            <Text
-              style={[
-                tw`text-right pr-2 font-bold text-sm`,
-                // { color: COLORS?.color_accent_dark },
-              ]}
-            >
-              Forgot password?
-            </Text>
-          </TouchableOpacity>
         </View>
 
         {/* Login button */}
         <View style={[tw`py-10 self-center`, { width: width / 1.4 }]}>
           <Button
             text="login"
-            // color={COLORS?.color_dark_dark}
             rounded="true"
             style={tw`bg-gray-200 rounded-full px-20`}
-            // onClick={signIn}
+            onPress={signIn}
           />
         </View>
 
@@ -162,14 +133,7 @@ const Login = ({ navigation }) => {
             style={tw`self-end -ml-4`}
             onPress={() => navigation.navigate("Register")}
           >
-            <Text
-              style={[
-                tw`font-bold`,
-                // { color: COLORS?.color_accent_dark }
-              ]}
-            >
-              Sign Up
-            </Text>
+            <Text style={[tw`font-bold`]}>Sign Up</Text>
           </TouchableOpacity>
         </View>
       </View>

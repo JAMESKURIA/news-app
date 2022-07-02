@@ -1,8 +1,8 @@
-import { View, Text } from "react-native";
 import React from "react";
+import { Text, View } from "react-native";
 import * as Progress from "react-native-progress";
 import tw from "tailwind-react-native-classnames";
-import { COLORS } from "../resources/theme";
+import COLORS from "../resources/theme";
 
 const Loading = ({ message = "Loading..." }) => {
   return (
