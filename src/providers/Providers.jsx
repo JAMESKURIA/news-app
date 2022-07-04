@@ -1,17 +1,23 @@
 import { AuthStack } from "navigation";
-import React from "react";
-import { SafeAreaProvider } from "react-native-safe-area-context";
-import { AuthProvider } from ".";
+import useAuth from "../hooks/useAuth";
+import { CustomerTabs, MediaTabs } from "../navigation";
 
 const Providers = () => {
+  const { currentUser } = useAuth();
+
+  if (!currentUser) {
+    return <AuthStack />;
+  }
+
   return (
-    <SafeAreaProvider>
-      <AuthProvider>
-        <AuthStack />
-        {/* <MediaTabs /> */}
-        {/* <CustomerTabs /> */}
-      </AuthProvider>
-    </SafeAreaProvider>
+    <>
+      {currentUser.login[0].login_rank.toLowerCase() === "customer" && (
+        <CustomerTabs />
+      )}
+      {currentUser.login[0].login_rank.toLowerCase() === "media" && (
+        <MediaTabs />
+      )}
+    </>
   );
 };
 
