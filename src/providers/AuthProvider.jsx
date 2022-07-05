@@ -40,7 +40,7 @@ const AuthProvider = ({ children }) => {
     return response.user;
   };
 
-  const signout = async (cb) => {
+  const signout = async (cb = () => null) => {
     await signOut(auth);
     setUser(false);
     cb();

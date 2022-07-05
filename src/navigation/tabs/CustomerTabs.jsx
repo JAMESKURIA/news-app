@@ -1,8 +1,8 @@
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import React from "react";
 import Icon from "react-native-dynamic-vector-icons";
+import { AccountStack } from "..";
 import { COLORS } from "../../resources";
-import { CustomerProfile, HomeScreen } from "../../screens";
+import { HomeScreen } from "../../screens";
 
 const Tab = createBottomTabNavigator();
 
@@ -40,7 +40,7 @@ const CustomerTabs = () => {
       />
       <Tab.Screen
         name="Account"
-        component={CustomerProfile}
+        component={AccountStack}
         options={{
           tabBarIcon: ({ focused, color, size }) => (
             <Icon

@@ -3,20 +3,16 @@ import useAuth from "../hooks/useAuth";
 import { CustomerTabs, MediaTabs } from "../navigation";
 
 const Providers = () => {
-  const { currentUser } = useAuth();
+  const { user } = useAuth();
 
-  if (!currentUser) {
+  if (!user) {
     return <AuthStack />;
   }
 
   return (
     <>
-      {currentUser.login[0].login_rank.toLowerCase() === "customer" && (
-        <CustomerTabs />
-      )}
-      {currentUser.login[0].login_rank.toLowerCase() === "media" && (
-        <MediaTabs />
-      )}
+      {user.rank.toLowerCase() === "customer" && <CustomerTabs />}
+      {user.rank.toLowerCase() === "media" && <MediaTabs />}
     </>
   );
 };

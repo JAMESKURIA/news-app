@@ -61,10 +61,19 @@ const HomeScreen = () => {
     }
   };
 
+  // Remove an image
+  const removeImage = (item) => {
+    // console.log("Clicked item: ", item);
+
+    const newImages = images.filter((file) => file.uri !== item.uri);
+
+    setImages(newImages);
+  };
+
   return (
     <ScrollView>
       {/* Upload images */}
-      <View style={tw`bg-gray-50 m-4 rounded p-4 shadow-lg`}>
+      <View style={tw`bg-gray-50 m-4 rounded p-4 shadow-none`}>
         <View style={tw`flex-row justify-between items-center`}>
           <Text style={tw` pb-4 text-gray-800`}>Upload Files</Text>
 
@@ -109,18 +118,45 @@ const HomeScreen = () => {
           )}
 
           {images.length > 0 &&
-            images.map((image, idx) => (
-              <Image
-                key={idx.toString()}
-                source={{ uri: image.uri }}
-                style={tw`h-24 w-24 rounded m-2`}
-              />
+            images.map((item, idx) => (
+              <View style={tw`rounded m-2 overflow-hidden`}>
+                <Image
+                  key={idx.toString()}
+                  source={{ uri: item.uri }}
+                  style={tw`h-24 w-24 rounded`}
+                />
+                <TouchableOpacity
+                  style={tw`absolute top-1 right-1 z-10`}
+                  onPress={() => removeImage(item)}
+                >
+                  <Icon
+                    name="cross"
+                    type="Entypo"
+                    size={19}
+                    color={"white"}
+                    style={[tw`rounded-full`, { backgroundColor: "red" }]}
+                  />
+                </TouchableOpacity>
+
+                {item.type === "video" && (
+                  <View
+                    style={tw`absolute rounded bg-black bg-opacity-70 top-0 left-0 w-full h-full items-center justify-center`}
+                  >
+                    <Icon
+                      name="play-circle"
+                      type="FontAwesome"
+                      size={26}
+                      color={"dodgerblue"}
+                    />
+                  </View>
+                )}
+              </View>
             ))}
         </View>
       </View>
 
       {/* Add media station name */}
-      <View style={tw`bg-gray-50 m-4 rounded p-4 shadow-lg flex-1 z-10`}>
+      <View style={tw`bg-gray-50 m-4 rounded p-4 shadow-none flex-1 z-10`}>
         <Text style={tw` pb-4 text-gray-800`}>Choose media station</Text>
         <View>
           <DropDownPicker
@@ -140,7 +176,7 @@ const HomeScreen = () => {
       </View>
 
       {/* Description */}
-      <View style={tw`bg-gray-50 m-4 rounded p-4 shadow-lg flex-1`}>
+      <View style={tw`bg-gray-50 m-4 rounded p-4 shadow-none flex-1`}>
         <Text style={tw` pb-4 text-gray-800`}>Short Description</Text>
         <OutlinedTextField
           label="Description"
@@ -158,8 +194,8 @@ const HomeScreen = () => {
       <View style={tw`m-4`}>
         <Button
           text="Submit"
-          style={tw`bg-blue-500 rounded-lg w-full shadow-lg`}
-          textStyle={tw`text-white `}
+          style={tw`bg-gray-300 rounded-lg w-full shadow-none`}
+          textStyle={tw`text-gray-900 `}
         />
       </View>
 

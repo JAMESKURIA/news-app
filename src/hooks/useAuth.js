@@ -21,6 +21,9 @@ const FETCH_USER = gql`
 const useAuth = () => {
   const { user, signin, signup, signout } = React.useContext(AuthContext);
 
+  if (!user) {
+  }
+
   const { data, loading, error } = useQuery(FETCH_USER, {
     variables: {
       loginId: user?.uid,
@@ -36,10 +39,18 @@ const useAuth = () => {
   }
 
   if (data) {
-    return { currentUser: data, signin, signup, signout };
+    const rank = data.login[0].login_rank;
+    const username = data.login[0].login_username;
+
+    return {
+      user: { rank, username, ...data.login[0].customers[0] },
+      signin,
+      signup,
+      signout,
+    };
   }
 
-  return { currentUser: null, signin, signup, signout };
+  return { user: null, signin, signup, signout };
 };
 
 export default useAuth;
