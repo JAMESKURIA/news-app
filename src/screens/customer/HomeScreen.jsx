@@ -1,26 +1,84 @@
+import { gql, useMutation } from "@apollo/client";
 import * as ImagePicker from "expo-image-picker";
+import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import React from "react";
-import { Image, ScrollView, Text, TouchableOpacity, View } from "react-native";
+import {
+  Alert,
+  Image,
+  Platform,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import DropDownPicker from "react-native-dropdown-picker";
 import Icon from "react-native-dynamic-vector-icons";
 import { OutlinedTextField } from "rn-material-ui-textfield";
 import tw from "tailwind-react-native-classnames";
-import { Button, LaunchMediaSheet, TouchView } from "../../components";
+import { Button, LaunchMediaSheet, Loading, TouchView } from "../../components";
+import { storage } from "../../config/firebase";
+import useAuth from "../../hooks/useAuth";
+import useStations from "../../hooks/useStations";
 import { COLORS } from "../../resources";
+
+const INSERT_NEWS = gql`
+  mutation insertNews(
+    $customerId: Int!
+    $desc: String!
+    $stationId: Int!
+    $files: [customer_files_insert_input!]!
+  ) {
+    insert_customer_news(
+      objects: {
+        customer_news_customer_id: $customerId
+        customer_news_desc: $desc
+        customer_news_media_station_id: $stationId
+        customer_files: { data: $files }
+        news_verifies: { data: {} }
+      }
+    ) {
+      affected_rows
+    }
+  }
+`;
 
 const HomeScreen = () => {
   const [open, setOpen] = React.useState(false);
-  const [value, setValue] = React.useState(null);
+  const [station, setStation] = React.useState(null);
   const [description, setDescription] = React.useState("");
-  const [errors, setErrors] = React.useState({});
-  const [items, setItems] = React.useState([
-    { label: "Citizen TV", value: "citizen" },
-    { label: "NTV", value: "ntv" },
-    { label: "K24 TV", value: "k24" },
-    { label: "INOORO TV", value: "inooro" },
-  ]);
+  const [files, setFiles] = React.useState([]);
 
-  const [images, setImages] = React.useState([]);
+  const [filesLoading, setFilesLoading] = React.useState(false);
+
+  const [items, setItems] = React.useState([]);
+
+  const { user } = useAuth();
+
+  // console.log("User: ", user);
+  const stations = useStations();
+
+  // Set Stations
+  React.useEffect(() => {
+    // console.log("Stations: ", stations);
+
+    setItems(stations);
+  }, [stations]);
+
+  const [
+    uploadNews,
+    { loading: newsLoading, data: newsData, error: newsError },
+  ] = useMutation(INSERT_NEWS);
+
+  // News uploaded
+  React.useEffect(() => {
+    if (newsData) {
+      Alert.alert("Success!", "Successfully uploaded news");
+
+      setDescription("");
+      setFiles([]);
+      setStation(null);
+    }
+  }, [newsData]);
 
   const sheetRef = React.useRef();
 
@@ -28,6 +86,7 @@ const HomeScreen = () => {
     sheetRef?.current?.open();
   };
 
+  // PICK IMAGE
   const pickImage = async ({ from }) => {
     let result;
 
@@ -54,10 +113,10 @@ const HomeScreen = () => {
         break;
     }
 
-    console.log(result);
+    // console.log(result);
 
     if (!result.cancelled) {
-      setImages((prevImages) => [...prevImages, result]);
+      setFiles((prevfiles) => [...prevfiles, result]);
     }
   };
 
@@ -65,19 +124,124 @@ const HomeScreen = () => {
   const removeImage = (item) => {
     // console.log("Clicked item: ", item);
 
-    const newImages = images.filter((file) => file.uri !== item.uri);
+    const newfiles = files.filter((file) => file.uri !== item.uri);
 
-    setImages(newImages);
+    setFiles(newfiles);
   };
+
+  // UPLOAD FILES
+  const onUploadSubmission = async (files) => {
+    const getBlob = async (uploadUri) => {
+      const response = await fetch(uploadUri);
+      const blob = await response.blob();
+
+      return blob;
+    };
+
+    const uploadFile = (file) => {
+      return new Promise(async (resolve, reject) => {
+        const { uri, type } = file;
+        const filename = uri.substring(uri.lastIndexOf("/") + 1);
+        const uploadUri =
+          Platform.OS === "ios" ? uri.replace("file://", "") : uri;
+
+        const fileBlob = await getBlob(uploadUri);
+
+        const storageRef = ref(storage, `files/${filename}`);
+
+        uploadBytes(storageRef, fileBlob).then((snapshot) => {
+          getDownloadURL(storageRef)
+            .then((url) => {
+              const file = {
+                customer_file_attachment: url,
+                customer_file_type: type,
+              };
+              resolve(file);
+            })
+            .catch((err) => reject(err));
+        });
+      });
+    };
+
+    let count = 0;
+    let uploadedFiles = [];
+
+    // Actual files uploading
+    while (count < files.length) {
+      const file = await uploadFile(files[count]);
+      uploadedFiles.push(file);
+
+      count++;
+
+      if (count == files.length) {
+        // console.log("FILES: ", uploadedFiles);
+
+        return uploadedFiles;
+      }
+    }
+  };
+
+  // Submit news
+  const submitNews = async () => {
+    // NO files
+    if (files.length < 1) {
+      Alert.alert("ALert", "Please choose at least one file");
+      return;
+    }
+
+    // No media station
+    if (!station) {
+      Alert.alert("ALert", "Please pick a media station!");
+      return;
+    }
+
+    // No desc
+    if (!description) {
+      Alert.alert("ALert", "Please pick a short description!");
+      return;
+    }
+
+    setFilesLoading(true);
+
+    const uploadedFiles = await onUploadSubmission(files);
+
+    setFilesLoading(false);
+
+    // console.log("Uploaded files: ", uploadedFiles);
+
+    uploadNews({
+      variables: {
+        customerId: user?.customer_id,
+        desc: description,
+        stationId: station,
+        files: uploadedFiles,
+      },
+    });
+  };
+
+  // Error States
+  // News Upload Error
+  if (newsError) {
+    console.log("Error uploading news: ", newsError);
+  }
+
+  // Loading states
+  if (filesLoading) {
+    return <Loading message="Uploading files..." />;
+  }
+
+  if (newsLoading) {
+    return <Loading message="Uploading news..." />;
+  }
 
   return (
     <ScrollView>
-      {/* Upload images */}
+      {/* Upload files */}
       <View style={tw`bg-gray-50 m-4 rounded p-4 shadow-none`}>
         <View style={tw`flex-row justify-between items-center`}>
           <Text style={tw` pb-4 text-gray-800`}>Upload Files</Text>
 
-          {images.length > 0 ? (
+          {files.length > 0 ? (
             <TouchView>
               <Text
                 style={tw`px-4 py-2 bg-gray-200 rounded-lg  mb-4 `}
@@ -92,12 +256,12 @@ const HomeScreen = () => {
         </View>
         <View
           style={tw`rounded h-56 bg-gray-300 ${
-            images.length > 0
+            files.length > 0
               ? "flex-row flex-wrap"
               : " items-center justify-center"
           } `}
         >
-          {images.length <= 0 && (
+          {files.length <= 0 && (
             <TouchableOpacity
               style={[
                 tw`flex-row items-center p-2 border border-dotted rounded`,
@@ -117,8 +281,8 @@ const HomeScreen = () => {
             </TouchableOpacity>
           )}
 
-          {images.length > 0 &&
-            images.map((item, idx) => (
+          {files.length > 0 &&
+            files.map((item, idx) => (
               <View style={tw`rounded m-2 overflow-hidden`}>
                 <Image
                   key={idx.toString()}
@@ -162,10 +326,10 @@ const HomeScreen = () => {
           <DropDownPicker
             placeholder="Select media station"
             open={open}
-            value={value}
+            value={station}
             items={items}
             setOpen={setOpen}
-            setValue={setValue}
+            setValue={setStation}
             setItems={setItems}
             style={{
               borderColor: COLORS.color_primary_dark,
@@ -185,7 +349,6 @@ const HomeScreen = () => {
           onChangeText={(text) => {
             setDescription(text);
           }}
-          error={errors?.description}
           value={description}
         />
       </View>
@@ -196,6 +359,7 @@ const HomeScreen = () => {
           text="Submit"
           style={tw`bg-gray-300 rounded-lg w-full shadow-none`}
           textStyle={tw`text-gray-900 `}
+          onPress={() => submitNews()}
         />
       </View>
 

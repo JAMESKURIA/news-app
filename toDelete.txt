@@ -1,0 +1,58 @@
+
+mutation insertNews($customerId: Int!, $desc: String!, $stationId: Int!, $files: [customer_files_insert_input!]! ) {
+  insert_customer_news(objects: {
+    customer_news_customer_id: $customerId, 
+    customer_news_desc: $desc, 
+    customer_news_media_station_id: $stationId, 
+    customer_files: {
+      data: $files
+    }
+  }) {
+    affected_rows
+  }
+}
+
+[
+   {
+    "customer_file_attachment": "https://firebasestorage.googleapis.com/v0/b/news-app-5d6e0.appspot.com/o/files%2Fbbc9e073-73b9-42b3-ab01-d558efd01035.jpg?alt=media&token=3c9d6d23-13d5-4017-a8b5-e015ad6032eb",
+    "customer_file_type": "image",
+  },
+   {
+    "customer_file_attachment": "https://firebasestorage.googleapis.com/v0/b/news-app-5d6e0.appspot.com/o/files%2F805daca4-3bdd-4091-a2f3-1c055ceca188.jpg?alt=media&token=849e8756-52c8-4ea9-a1d5-f3ce78329dea",
+    "customer_file_type": "image",
+  },
+   {
+    "customer_file_attachment": "https://firebasestorage.googleapis.com/v0/b/news-app-5d6e0.appspot.com/o/files%2F2b8ef53b-8143-4bbc-bce8-6e74cb8c948a.jpg?alt=media&token=b59b8a71-dbdb-4416-9b76-c8861d61ff7f",
+    "customer_file_type": "image",
+  },
+]
+
+
+
+
+
+query fetchCustomerNews($customerId: Int!) {
+  customer_news(where: {customer_news_customer_id: {_eq: $customerId}}) {
+    customer_files {
+      customer_file_attachment
+      customer_file_type
+    }
+    customer_news_date_posted
+    customer_news_desc
+    customer_news_id
+    media_station {
+      media_station_id
+      media_station_name
+    }
+    news_verifies {
+      news_verify_status
+    }
+  }
+}
+
+// const data = {
+            //   title: n.media_station.media_station_name,
+            //   desc: n.customer_news_desc,
+            //   date: n.customer_news_date_posted,
+            //   status: n.news_verifies[0].news_verify_status,
+            // };

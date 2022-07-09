@@ -1,10 +1,12 @@
-import React from "react";
 import { Image, Text, TouchableOpacity, View } from "react-native";
 import Icon from "react-native-dynamic-vector-icons";
 import tw from "tailwind-react-native-classnames";
 import { COLORS, STATUS } from "../resources";
 
-const NewsCard = ({ type = "customer", onPress, style }) => {
+const NewsCard = ({ type = "customer", onPress, style, data }) => {
+  // console.log("News data: ", data);
+  const { date, desc, image, status, title } = data;
+
   return (
     <TouchableOpacity
       onPress={onPress}
@@ -15,16 +17,13 @@ const NewsCard = ({ type = "customer", onPress, style }) => {
       ]}
     >
       <View style={tw`w-2/3 `}>
-        <Text style={tw`leading-6 text-lg font-semibold`}>
-          {type == "media" ? "John Doe" : "Citizen TV"}
-        </Text>
+        <Text style={tw`leading-6 text-lg font-semibold`}>{title}</Text>
         <Text style={tw`leading-5 py-2`} numberOfLines={2}>
-          Lorem ipsum dolor sit amet, consectetur adipisicing elit. Lorem ipsum
-          dolor sit.
+          {desc}
         </Text>
         <View style={tw`flex-row justify-between items-center`}>
           <Text style={[tw`leading-6`, { color: COLORS.color_dark_light }]}>
-            November 25, 2020
+            {date}
           </Text>
           <View style={tw`flex-row items-center`}>
             <Icon
@@ -46,7 +45,9 @@ const NewsCard = ({ type = "customer", onPress, style }) => {
         </View>
       </View>
       <Image
-        source={require("../images/news1.jpg")}
+        source={{
+          uri: image,
+        }}
         style={tw`h-24 w-24 rounded`}
       />
     </TouchableOpacity>

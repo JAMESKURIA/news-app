@@ -5,7 +5,6 @@ import { MenuProvider } from "react-native-popup-menu";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import tw from "tailwind-react-native-classnames";
 import { ApolloClientProvider, AuthProvider, Providers } from "./src/providers";
-import { COLORS } from "./src/resources";
 
 export default function App() {
   LogBox.ignoreAllLogs(true);
@@ -21,7 +20,8 @@ export default function App() {
                   <MenuProvider>
                     <StatusBar
                       style="auto"
-                      backgroundColor={COLORS.color_light_dark}
+                      // backgroundColor={COLORS.color_light_dark}
+                      backgroundColor="white"
                     />
                     <Providers />
                   </MenuProvider>
