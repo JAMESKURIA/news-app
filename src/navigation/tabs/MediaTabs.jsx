@@ -1,8 +1,9 @@
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import Icon from "react-native-dynamic-vector-icons";
-import { NewsStack } from "..";
+
 import { COLORS } from "../../resources";
 import AccountStack from "../stacks/AccountStack";
+import NewsStack from "../stacks/NewsStack";
 
 const Tab = createBottomTabNavigator();
 

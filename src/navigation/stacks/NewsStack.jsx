@@ -1,13 +1,11 @@
 import { createStackNavigator } from "@react-navigation/stack";
-import useAuth from "../../hooks/useAuth";
+import useUser from "../../hooks/useUser";
 import { PersonalNews, SingleNews, SubmittedNews } from "../../screens";
 
 const Stack = createStackNavigator();
 
 const NewsStack = () => {
-  const {
-    user: { rank },
-  } = useAuth();
+  const { rank } = useUser();
 
   return (
     <Stack.Navigator

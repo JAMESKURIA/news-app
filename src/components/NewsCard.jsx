@@ -1,10 +1,9 @@
 import { Image, Text, TouchableOpacity, View } from "react-native";
-import Icon from "react-native-dynamic-vector-icons";
 import tw from "tailwind-react-native-classnames";
-import { COLORS, STATUS } from "../resources";
+import { COLORS } from "../resources";
+import NewsStatus from "./NewsStatus";
 
 const NewsCard = ({ type = "customer", onPress, style, data }) => {
-  // console.log("News data: ", data);
   const { date, desc, image, status, title } = data;
 
   return (
@@ -25,23 +24,7 @@ const NewsCard = ({ type = "customer", onPress, style, data }) => {
           <Text style={[tw`leading-6`, { color: COLORS.color_dark_light }]}>
             {date}
           </Text>
-          <View style={tw`flex-row items-center`}>
-            <Icon
-              type={STATUS.APPROVED.icon.type}
-              name={STATUS.APPROVED.icon.name}
-              color={STATUS.APPROVED.color}
-              size={14}
-              style={tw`mr-1`}
-            />
-            <Text
-              style={[
-                tw`text-sm font-semibold`,
-                { color: STATUS.APPROVED.color },
-              ]}
-            >
-              {STATUS.APPROVED.text}
-            </Text>
-          </View>
+          <NewsStatus status={status} />
         </View>
       </View>
       <Image

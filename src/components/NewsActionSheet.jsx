@@ -1,3 +1,4 @@
+import { gql, useMutation } from "@apollo/client";
 import React from "react";
 import { Alert, Text, View } from "react-native";
 import {
@@ -8,14 +9,68 @@ import {
   renderers,
 } from "react-native-popup-menu";
 import tw from "tailwind-react-native-classnames";
+import useAdmin from "../hooks/useAdmin";
 import { ACTIONS } from "../resources";
+import Loading from "./Loading";
 import PaymentModal from "./PaymentModal";
+
+const UPDATE_NEWS = gql`
+  mutation verifyNews($newsId: Int!, $adminId: Int!, $status: String) {
+    update_news_verify(
+      where: { customer_new: { customer_news_id: { _eq: $newsId } } }
+      _set: {
+        news_verify_media_admin_id: $adminId
+        news_verify_status: $status
+      }
+    ) {
+      affected_rows
+    }
+  }
+`;
 
 const { SlideInMenu } = renderers;
 
 const NewsActionSheet = React.forwardRef(
   ({ newsItem, cb = () => null, newspage }, ref) => {
     const [modalVisible, setModalVisible] = React.useState(false);
+
+    const { media_admin_id: adminId } = useAdmin();
+
+    const [
+      upDateNews,
+      { data: updateData, loading: updateLoading, error: updateError },
+    ] = useMutation(UPDATE_NEWS);
+
+    const handleNewsActions = (type) => {
+      switch (type) {
+        case "approve":
+          upDateNews({
+            variables: {
+              newsId: newsItem,
+              adminId,
+              status: "verified",
+            },
+          });
+
+          break;
+
+        case "reject":
+          upDateNews({
+            variables: {
+              newsId: newsItem,
+              adminId,
+              status: "rejected",
+            },
+          });
+
+          break;
+
+        case "pay":
+          break;
+        default:
+          break;
+      }
+    };
 
     const handlePayment = ({ type, amount, currency, refNumber }) => {
       cb();
@@ -45,8 +100,9 @@ const NewsActionSheet = React.forwardRef(
             {
               text: "OK",
               onPress: () => {
-                console.log(`Approved ${newsItem}`);
-                cb();
+                handleNewsActions("approve");
+                // console.log(`News Id ${newsItem}`);
+                // console.log(`Admin Id ${adminId}`);
               },
             },
           ]);
@@ -67,8 +123,8 @@ const NewsActionSheet = React.forwardRef(
               {
                 text: "OK",
                 onPress: () => {
-                  console.log(`Rejected news ${newsItem}`);
-                  cb();
+                  handleNewsActions("reject");
+                  // console.log(`Rejected news ${newsItem}`);
                 },
               },
             ]
@@ -102,6 +158,23 @@ const NewsActionSheet = React.forwardRef(
       }
     };
 
+    React.useEffect(() => {
+      if (updateData) {
+        cb((type = "refetch"));
+        // console.log("Updated news: ", updateData);
+        Alert.alert("Success", `Successfully updated News `);
+      }
+    }, [updateData]);
+
+    // Loading state
+    if (updateLoading) {
+      return <Loading message="updating news..." />;
+    }
+
+    // Error state
+    if (updateError) {
+      console.log("An error occurred while updating news: ", updateError);
+    }
     return (
       <View>
         <Menu renderer={SlideInMenu} ref={ref}>

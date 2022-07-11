@@ -1,8 +1,9 @@
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import Icon from "react-native-dynamic-vector-icons";
-import { AccountStack } from "..";
+
 import { COLORS } from "../../resources";
 import { HomeScreen } from "../../screens";
+import AccountStack from "../stacks/AccountStack";
 
 const Tab = createBottomTabNavigator();
 

@@ -39,27 +39,23 @@ const Login = ({ navigation }) => {
       // console.log("password: ", password);
 
       await signin(email.toLowerCase().trim(), password);
-
-      setLoading(false);
     } catch (error) {
-      setLoading(false);
-
-      console.log("Error Occured Here: ", JSON.stringify(error));
-
+      // console.log("Error Occured Here: ", JSON.stringify(error));
+      console.log("Error Occured Here: ", error);
       // wrong password
-      if (error.code.includes("wrong-password")) {
+      if (error?.code?.includes("wrong-password")) {
         setErrors({ ...errors, passError: "Wrong password" });
         return;
       }
 
       // invlaid email
-      if (error.code.includes("invalid-email")) {
+      if (error?.code?.includes("invalid-email")) {
         setErrors({ ...errors, emailError: "Invalid email!" });
         return;
       }
 
       // inexistent email
-      if (error.code.includes("user-not-found")) {
+      if (error?.code?.includes("user-not-found")) {
         setErrors({ ...errors, emailError: "User not found!" });
         return;
       }
@@ -68,7 +64,7 @@ const Login = ({ navigation }) => {
 
   // Show loader
   if (loading) {
-    return <Loading />;
+    return <Loading message="logging you in..." />;
   }
 
   return (

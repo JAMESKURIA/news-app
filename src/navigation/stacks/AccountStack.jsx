@@ -1,5 +1,5 @@
 import { createStackNavigator } from "@react-navigation/stack";
-import useAuth from "../../hooks/useAuth";
+import useUser from "../../hooks/useUser";
 import {
   Earnings,
   PersonalNews,
@@ -12,9 +12,8 @@ import {
 const Stack = createStackNavigator();
 
 const AccountStack = () => {
-  const {
-    user: { rank },
-  } = useAuth();
+  const { rank } = useUser();
+
   return (
     <Stack.Navigator
       initialRouteName={"Settings"}
@@ -25,15 +24,15 @@ const AccountStack = () => {
       <Stack.Screen name="Settings" component={Settings} />
       <Stack.Screen name="Profile" component={Profile} />
 
-      {rank.toLowerCase() === "media" && (
+      {rank === "media" && (
         <Stack.Screen name="SubmittedNews" component={SubmittedNews} />
       )}
 
-      {rank.toLowerCase() === "customer" && (
+      {rank === "customer" && (
         <Stack.Screen name="PersonalNews" component={PersonalNews} />
       )}
 
-      {rank.toLowerCase() === "customer" && (
+      {rank === "customer" && (
         <Stack.Screen name="Earnings" component={Earnings} />
       )}
 
