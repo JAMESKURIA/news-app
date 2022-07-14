@@ -17,7 +17,7 @@ import { OutlinedTextField } from "rn-material-ui-textfield";
 import tw from "tailwind-react-native-classnames";
 import { Button, LaunchMediaSheet, Loading, TouchView } from "../../components";
 import { storage } from "../../config/firebase";
-import useAuth from "../../hooks/useAuth";
+import useCustomer from "../../hooks/useCustomer";
 import useStations from "../../hooks/useStations";
 import { COLORS } from "../../resources";
 
@@ -52,7 +52,7 @@ const HomeScreen = () => {
 
   const [items, setItems] = React.useState([]);
 
-  const { user } = useAuth();
+  const { customer_id: customerId } = useCustomer();
 
   // console.log("User: ", user);
   const stations = useStations();
@@ -70,15 +70,13 @@ const HomeScreen = () => {
   ] = useMutation(INSERT_NEWS);
 
   // News uploaded
-  React.useEffect(() => {
-    if (newsData) {
-      Alert.alert("Success!", "Successfully uploaded news");
+  const uploadedSuccess = React.useCallback(() => {
+    Alert.alert("Success!", "Successfully uploaded news");
 
-      setDescription("");
-      setFiles([]);
-      setStation(null);
-    }
-  }, [newsData]);
+    setDescription("");
+    setFiles([]);
+    setStation(null);
+  }, []);
 
   const sheetRef = React.useRef();
 
@@ -211,7 +209,7 @@ const HomeScreen = () => {
 
     uploadNews({
       variables: {
-        customerId: user?.customer_id,
+        customerId,
         desc: description,
         stationId: station,
         files: uploadedFiles,
@@ -359,7 +357,7 @@ const HomeScreen = () => {
           text="Submit"
           style={tw`bg-gray-300 rounded-lg w-full shadow-none`}
           textStyle={tw`text-gray-900 `}
-          onPress={() => submitNews()}
+          onPress={() => submitNews().then(() => uploadedSuccess())}
         />
       </View>
 

@@ -160,8 +160,7 @@ const NewsActionSheet = React.forwardRef(
 
     React.useEffect(() => {
       if (updateData) {
-        cb((type = "refetch"));
-        // console.log("Updated news: ", updateData);
+        console.log("Updated news: ", updateData);
         Alert.alert("Success", `Successfully updated News `);
       }
     }, [updateData]);

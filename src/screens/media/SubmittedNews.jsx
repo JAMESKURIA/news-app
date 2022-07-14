@@ -1,4 +1,4 @@
-import { gql, useLazyQuery } from "@apollo/client";
+import { gql, useQuery } from "@apollo/client";
 import React from "react";
 import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 import DropDownPicker from "react-native-dropdown-picker";
@@ -38,7 +38,6 @@ const FETCH_NEWS = gql`
 const SubmittedNews = ({ navigation }) => {
   const [news, setNews] = React.useState([]);
   const [open, setOpen] = React.useState(false);
-  const [refetch, setRefetch] = React.useState(false);
   const [value, setValue] = React.useState(null);
   const [items, setItems] = React.useState([
     { label: "approved", value: "approved" },
@@ -51,23 +50,17 @@ const SubmittedNews = ({ navigation }) => {
 
   const { media_admin_id: adminId } = useAdmin();
 
-  console.log(adminId);
-  const [fetchNews, { loading, error, data }] = useLazyQuery(FETCH_NEWS);
+  // console.log("Admin ID: ", adminId);
+  const { loading, error, data } = useQuery(FETCH_NEWS, {
+    variables: { adminId },
+    fetchPolicy: "network-only",
+  });
 
-  const getNews = React.useCallback(() => {
-    fetchNews({
-      variables: {
-        adminId,
-      },
-      fetchPolicy: "network-only",
-    });
-  }, [refetch, adminId]);
-
-  React.useEffect(() => {
-    if (adminId) {
-      getNews();
-    }
-  }, [adminId, news]);
+  // React.useEffect(() => {
+  //   if (adminId) {
+  //     fetchNews();
+  //   }
+  // }, [adminId]);
 
   React.useEffect(() => {
     if (data) {
@@ -180,11 +173,6 @@ const SubmittedNews = ({ navigation }) => {
                 media: true,
               });
               setActiveCard();
-              break;
-
-            case "refetch":
-              getNews();
-              setRefetch(!refetch);
               break;
 
             default:

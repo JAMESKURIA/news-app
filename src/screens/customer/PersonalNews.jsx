@@ -52,6 +52,7 @@ const PersonalNews = ({ navigation }) => {
         variables: {
           customerId,
         },
+        fetchPolicy: "network-only",
       });
     }
   }, [customerId]);
