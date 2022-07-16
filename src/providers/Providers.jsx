@@ -56,7 +56,7 @@ const Providers = () => {
 
   // Loading state
   if (loading) {
-    return <Loading message="Just a moment..." />;
+    return <Loading message="logging you in..." />;
   }
 
   // Error states

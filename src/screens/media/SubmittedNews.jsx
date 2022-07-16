@@ -1,4 +1,4 @@
-import { gql, useQuery } from "@apollo/client";
+import { gql, useLazyQuery } from "@apollo/client";
 import React from "react";
 import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 import DropDownPicker from "react-native-dropdown-picker";
@@ -51,10 +51,7 @@ const SubmittedNews = ({ navigation }) => {
   const { media_admin_id: adminId } = useAdmin();
 
   // console.log("Admin ID: ", adminId);
-  const { loading, error, data } = useQuery(FETCH_NEWS, {
-    variables: { adminId },
-    fetchPolicy: "network-only",
-  });
+  const [fetchNews, { loading, error, data }] = useLazyQuery(FETCH_NEWS);
 
   // React.useEffect(() => {
   //   if (adminId) {
@@ -63,10 +60,17 @@ const SubmittedNews = ({ navigation }) => {
   // }, [adminId]);
 
   React.useEffect(() => {
+    if (adminId) {
+      fetchNews({
+        variables: { adminId },
+        fetchPolicy: "network-only",
+      });
+    }
+
     if (data) {
       setNews(data.customer_news);
     }
-  }, [data]);
+  }, [data, adminId, open]);
 
   const menuRef = React.useRef();
 

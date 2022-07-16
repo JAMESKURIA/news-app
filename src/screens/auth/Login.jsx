@@ -40,8 +40,9 @@ const Login = ({ navigation }) => {
 
       await signin(email.toLowerCase().trim(), password);
     } catch (error) {
+      setLoading(false);
       // console.log("Error Occured Here: ", JSON.stringify(error));
-      console.log("Error Occured Here: ", error);
+      // console.log("Error Occured Here: ", error);
       // wrong password
       if (error?.code?.includes("wrong-password")) {
         setErrors({ ...errors, passError: "Wrong password" });
@@ -56,7 +57,8 @@ const Login = ({ navigation }) => {
 
       // inexistent email
       if (error?.code?.includes("user-not-found")) {
-        setErrors({ ...errors, emailError: "User not found!" });
+        // console.log("Hey Error :(");
+        setErrors((prev) => ({ ...prev, emailError: "User not found!" }));
         return;
       }
     }
@@ -64,7 +66,7 @@ const Login = ({ navigation }) => {
 
   // Show loader
   if (loading) {
-    return <Loading message="logging you in..." />;
+    return <Loading message="Just a moment..." />;
   }
 
   return (
