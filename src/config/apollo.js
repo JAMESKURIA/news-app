@@ -1,14 +1,15 @@
 import {
   ApolloClient,
-  HttpLink,
   ApolloLink,
-  InMemoryCache,
   concat,
+  HttpLink,
+  InMemoryCache,
 } from "@apollo/client";
 
 const makeApolloClient = (token) => {
   const httpLink = new HttpLink({
-    uri: "https://news-app.hasura.app/v1/graphql",
+    // uri: "https://news-app.hasura.app/v1/graphql",
+    uri: "https://news-app-db.hasura.app/v1/graphql",
   });
 
   const authMiddleware = new ApolloLink((operation, forward) => {

@@ -141,7 +141,7 @@ const SubmittedNews = ({ navigation }) => {
           {news.map((n) => {
             const _data = {
               title: n.customer.customer_name,
-              date: n.customre_news_date_posted,
+              date: n.customer_news_date_posted,
               desc: n.customer_news_desc,
               image: n.customer_files[0].customer_file_attachment,
               status: n?.news_verifies[0]?.news_verify_status,
