@@ -1,9 +1,39 @@
-import { View, Text, ScrollView } from "react-native";
+import { gql, useQuery } from "@apollo/client";
 import React from "react";
+import { Alert, ScrollView, Text, View } from "react-native";
 import tw from "tailwind-react-native-classnames";
+import { Loading } from "../../components";
+import useCustomer from "../../hooks/useCustomer";
 import { COLORS } from "../../resources";
 
-const Payment = ({ station, amount, ...props }) => {
+const FETCH_PAYMENTS = gql`
+  query getPayments($customerId: Int) {
+    payments(
+      where: {
+        media_admin: {
+          news_verifies: {
+            customer_new: { customer_news_customer_id: { _eq: $customerId } }
+          }
+        }
+      }
+    ) {
+      payment_amount
+      payment_id
+      payment_ref
+      payments_date
+      payments_mode
+      payment_currency_type
+      media_admin {
+        media_stations {
+          media_station_id
+          media_station_name
+        }
+      }
+    }
+  }
+`;
+
+const Payment = ({ station, amount, currency, ...props }) => {
   return (
     <View
       style={[
@@ -12,55 +42,61 @@ const Payment = ({ station, amount, ...props }) => {
       ]}
     >
       <Text>{station}</Text>
-      <Text>{`Ksh ${amount}`}</Text>
+      <Text style={tw`capitalize`}>{`${currency} ${amount}`}</Text>
     </View>
   );
 };
 
 const Earnings = () => {
-  const PAYMENTS = [
-    {
-      id: 1,
-      station: "KBC",
-      amount: 45.78,
-    },
-    {
-      id: 2,
-      station: "KTN",
-      amount: 45.78,
-    },
-    {
-      id: 3,
-      station: "NTV",
-      amount: 45.78,
-    },
-    {
-      id: 4,
-      station: "Citizen TV",
-      amount: 45.78,
-    },
-    {
-      id: 5,
-      station: "Inooro TV",
-      amount: 45.78,
-    },
-  ];
+  const { customer_id: customerId } = useCustomer();
+  const { loading, error, data } = useQuery(FETCH_PAYMENTS, {
+    variables: { customerId },
+  });
 
   const [totalEarnings, setTotalEarnings] = React.useState(0);
+  const [payments, setPayments] = React.useState([]);
 
-  const totalE = PAYMENTS.reduce((acc, value) => {
-    return acc + value.amount;
+  const totalE = payments.reduce((acc, value) => {
+    return acc + parseFloat(value.amount);
   }, 0);
 
   React.useEffect(() => {
     setTotalEarnings(totalE);
-  }, [PAYMENTS]);
+  }, [payments]);
 
+  React.useEffect(() => {
+    if (data) {
+      const _paymData = data.payments.map((paym) => ({
+        id: paym.payment_id,
+        currency: paym.payment_currency_type,
+        amount: paym.payment_amount,
+        paymentRef: paym.payment_ref,
+        date: paym.payments_date,
+        mode: paym.payments_mode,
+        station: {
+          id: paym.media_admin.media_stations[0].media_station_id,
+          name: paym.media_admin.media_stations[0].media_station_name,
+        },
+      }));
+
+      setPayments([..._paymData]);
+
+      console.log(_paymData);
+    }
+  }, [data]);
+
+  if (error) {
+    console.log("Error fetching payments: ", error);
+    Alert.alert("Error", "Some error occurred while fetching payments");
+  }
+  if (loading) {
+    return <Loading message="fetching payments..." />;
+  }
   return (
     <>
       <View
         style={[
-          tw`h-48 items-center justify-center`,
+          tw`h-48 items-center justify-center `,
           { backgroundColor: COLORS.color_accent_dark },
         ]}
       >
@@ -73,42 +109,46 @@ const Earnings = () => {
       </View>
 
       {/* All Payments */}
-      <ScrollView>
-        <View style={[tw`p-6`, { backgroundColor: COLORS.color_light_dark }]}>
-          <Text
-            style={[
-              tw`text-center leading-6`,
-              { color: COLORS.color_dark_accent },
-            ]}
-          >
-            Lorem ipsum, dolor sit amet consectetur adipisicing elit. Ex, est
-            numquam incidunt.
-          </Text>
-          <View style={[tw`pt-3`]}>
-            <Payment
-              station="Total Balance"
-              amount="74.99"
-              ContainerStyle={[
-                tw`rounded-full`,
-                { backgroundColor: COLORS.color_accent_dark },
+      <View style={[tw`flex-1`, { backgroundColor: COLORS.color_light_dark }]}>
+        <ScrollView>
+          <View style={tw`p-6`}>
+            <Text
+              style={[
+                tw`text-center leading-6`,
+                { color: COLORS.color_dark_accent },
               ]}
-            />
-
-            {PAYMENTS.map((payment) => (
+            >
+              Lorem ipsum, dolor sit amet consectetur adipisicing elit. Ex, est
+              numquam incidunt.
+            </Text>
+            <View style={[tw`pt-3`]}>
               <Payment
-                key={payment.id.toString()}
-                station={payment.station}
-                amount={payment.amount}
+                currency={""}
+                station="Total Balance"
+                amount={totalE}
                 ContainerStyle={[
                   tw`rounded-full`,
-                  { backgroundColor: COLORS.color_dark_accent },
+                  { backgroundColor: COLORS.color_accent_dark },
                 ]}
-                TextStyle={{ color: "red" }}
               />
-            ))}
+
+              {payments.map((payment) => (
+                <Payment
+                  key={payment.id.toString()}
+                  station={payment.station.name}
+                  currency={payment.currency}
+                  amount={payment.amount}
+                  ContainerStyle={[
+                    tw`rounded-full`,
+                    { backgroundColor: COLORS.color_dark_accent },
+                  ]}
+                  TextStyle={{ color: "red" }}
+                />
+              ))}
+            </View>
           </View>
-        </View>
-      </ScrollView>
+        </ScrollView>
+      </View>
     </>
   );
 };

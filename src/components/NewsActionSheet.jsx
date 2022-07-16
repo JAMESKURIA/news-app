@@ -28,6 +28,35 @@ const UPDATE_NEWS = gql`
   }
 `;
 
+const PAY_NEWS = gql`
+  mutation payNews(
+    $newsId: Int!
+    $adminId: Int!
+    $amount: String
+    $currency: String
+    $mode: String
+    $refNumber: String
+  ) {
+    insert_payments_one(
+      object: {
+        payment_amount: $amount
+        payment_currency_type: $currency
+        payment_customer_news_id: $newsId
+        payment_media_admin_id: $adminId
+        payment_ref: $refNumber
+        payments_mode: $mode
+      }
+    ) {
+      payment_id
+    }
+    update_news_verify(
+      where: { news_verify_customer_news_id: { _eq: $newsId } }
+      _set: { news_verify_status: "paid" }
+    ) {
+      affected_rows
+    }
+  }
+`;
 const { SlideInMenu } = renderers;
 
 const NewsActionSheet = React.forwardRef(
@@ -40,6 +69,9 @@ const NewsActionSheet = React.forwardRef(
       upDateNews,
       { data: updateData, loading: updateLoading, error: updateError },
     ] = useMutation(UPDATE_NEWS);
+
+    const [payNews, { data: payData, loading: payLoading, error: payError }] =
+      useMutation(PAY_NEWS);
 
     const handleNewsActions = (type) => {
       switch (type) {
@@ -72,16 +104,27 @@ const NewsActionSheet = React.forwardRef(
       }
     };
 
-    const handlePayment = ({ type, amount, currency, refNumber }) => {
+    const handlePayment = ({ type, amount, currency, refNumber, mode }) => {
       cb();
 
+      const newsId = newsItem;
+
+      setModalVisible((prev) => !prev);
+
       if (type === "cancel") {
-        setModalVisible((prev) => !prev);
         return;
       }
 
-      console.log({ amount, currency, refNumber });
-      setModalVisible((prev) => !prev);
+      payNews({
+        variables: {
+          newsId,
+          adminId,
+          amount,
+          currency,
+          mode,
+          refNumber,
+        },
+      });
     };
 
     // Handle News Actions
@@ -160,19 +203,22 @@ const NewsActionSheet = React.forwardRef(
 
     React.useEffect(() => {
       if (updateData) {
-        console.log("Updated news: ", updateData);
+        console.log("Updated news: ", updateData || payData);
         Alert.alert("Success", `Successfully updated News `);
       }
     }, [updateData]);
 
     // Loading state
-    if (updateLoading) {
+    if (updateLoading || payLoading) {
       return <Loading message="updating news..." />;
     }
 
     // Error state
-    if (updateError) {
-      console.log("An error occurred while updating news: ", updateError);
+    if (updateError || payError) {
+      console.log(
+        "An error occurred while updating news: ",
+        updateError || payError
+      );
     }
     return (
       <View>

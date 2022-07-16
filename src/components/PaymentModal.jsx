@@ -8,15 +8,22 @@ import Button from "./Button";
 
 const PaymentModal = ({ modalVisible, handlePayment }) => {
   const [open, setOpen] = React.useState(false);
-  const [value, setValue] = React.useState(null);
+  const [openMode, setOpenMode] = React.useState(false);
   const [amount, setAmount] = React.useState("");
   const [currency, setCurrency] = React.useState("KES");
+  const [mode, setMode] = React.useState("MPESA");
   const [refNumber, setRefNumber] = React.useState("");
   const [items, setItems] = React.useState([
     { label: "KES", value: "KES" },
     { label: "USD", value: "USD" },
     { label: "EUR", value: "EUR" },
     { label: "YUAN", value: "YUAN" },
+  ]);
+  const [paymentModes, setPaymentModes] = React.useState([
+    { label: "MPESA", value: "MPESA" },
+    { label: "CHEQUE", value: "CHEQUE" },
+    { label: "BANK TRANSFER", value: "BANK TRANSFER" },
+    { label: "PAYPAL", value: "PAYPAL" },
   ]);
 
   return (
@@ -39,10 +46,10 @@ const PaymentModal = ({ modalVisible, handlePayment }) => {
                 <DropDownPicker
                   placeholder="KES"
                   open={open}
-                  value={value}
+                  value={currency}
                   items={items}
                   setOpen={setOpen}
-                  setValue={setValue}
+                  setValue={setCurrency}
                   setItems={setItems}
                   onChangeValue={(value) => setCurrency(value)}
                   style={[
@@ -56,6 +63,30 @@ const PaymentModal = ({ modalVisible, handlePayment }) => {
                 />
               </View>
             </View>
+          </View>
+
+          {/* Payment Mode */}
+          <View style={tw`bg-white rounded p-2 my-2 z-10`}>
+            <Text style={tw` pb-4 text-gray-800 text-lg`}>Payment Mode</Text>
+
+            <DropDownPicker
+              placeholder="KES"
+              open={openMode}
+              value={mode}
+              items={paymentModes}
+              setOpen={setOpenMode}
+              setValue={setMode}
+              setItems={setPaymentModes}
+              onChangeValue={(value) => setMode(value)}
+              style={[
+                tw`h-14 -mt-2`,
+                {
+                  borderColor: COLORS.color_primary_dark,
+                  // backgroundColor: COLORS.color_primary_dark,  fc
+                  // width: "50%",
+                },
+              ]}
+            />
           </View>
 
           {/* REF NO */}
@@ -80,7 +111,13 @@ const PaymentModal = ({ modalVisible, handlePayment }) => {
               style={tw`bg-blue-500 w-full rounded`}
               textStyle={tw`text-white font-semibold`}
               onPress={() =>
-                handlePayment({ type: "pay", amount, currency, refNumber })
+                handlePayment({
+                  type: "pay",
+                  amount,
+                  currency,
+                  refNumber,
+                  mode,
+                })
               }
             />
           </View>
