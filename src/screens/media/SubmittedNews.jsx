@@ -1,4 +1,4 @@
-import { gql, useQuery } from "@apollo/client";
+import { gql, useLazyQuery } from "@apollo/client";
 import React from "react";
 import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 import DropDownPicker from "react-native-dropdown-picker";
@@ -6,6 +6,7 @@ import Icon from "react-native-dynamic-vector-icons";
 import tw from "tailwind-react-native-classnames";
 import { Loading, NewsActionSheet, NewsCard } from "../../components";
 import useAdmin from "../../hooks/useAdmin";
+import useUser from "../../hooks/useUser";
 import { ACTIONS, COLORS } from "../../resources";
 
 const FETCH_NEWS = gql`
@@ -35,7 +36,32 @@ const FETCH_NEWS = gql`
   }
 `;
 
+const FETCH_ALL_NEWS = gql`
+  query getNews {
+    customer_news {
+      customer {
+        customer_id
+        customer_name
+      }
+      customer_files {
+        customer_file_id
+        customer_file_attachment
+        customer_file_type
+      }
+      customer_news_id
+      customer_news_desc
+      customer_news_date_posted
+      news_verifies {
+        news_verify_id
+        news_verify_status
+      }
+    }
+  }
+`;
+
 const SubmittedNews = ({ navigation }) => {
+  const { rank } = useUser();
+
   const [news, setNews] = React.useState([]);
   const [open, setOpen] = React.useState(false);
   const [value, setValue] = React.useState(null);
@@ -51,22 +77,42 @@ const SubmittedNews = ({ navigation }) => {
   const { media_admin_id: adminId } = useAdmin();
 
   // console.log("Admin ID: ", adminId);
-  const { loading, error, data } = useQuery(FETCH_NEWS, {
-    variables: { adminId },
-    fetchPolicy: "network-only",
-  });
+  const [
+    getMediaAdminNews,
+    { loading: mediaLoading, error: mediaError, data: mediaData },
+  ] = useLazyQuery(FETCH_NEWS);
 
-  // React.useEffect(() => {
-  //   if (adminId) {
-  //     fetchNews();
-  //   }
-  // }, [adminId]);
+  const [
+    getAllNews,
+    { loading: newsLoading, error: newsError, data: newsData },
+  ] = useLazyQuery(FETCH_ALL_NEWS);
 
   React.useEffect(() => {
-    if (data) {
-      setNews(data.customer_news);
+    if (rank.toLowerCase() === "media" && adminId) {
+      getMediaAdminNews({
+        variables: { adminId },
+        fetchPolicy: "network-only",
+      });
     }
-  }, [data]);
+
+    if (rank.toLowerCase() === "super-admin") {
+      getAllNews();
+    }
+  }, [rank, adminId]);
+
+  React.useEffect(() => {
+    if (mediaData) {
+      // console.log("All News: ", newsData);
+      setNews(mediaData.customer_news);
+    }
+  }, [mediaData]);
+
+  React.useEffect(() => {
+    if (newsData) {
+      // console.log("All News: ", newsData);
+      setNews(newsData.customer_news);
+    }
+  }, [newsData]);
 
   const menuRef = React.useRef();
 
@@ -76,12 +122,12 @@ const SubmittedNews = ({ navigation }) => {
   };
 
   // Error states
-  if (error) {
-    console.log("Error fetching station news: ", error);
+  if (mediaError || newsError) {
+    console.log("Error fetching station news: ", mediaError || newsError);
   }
 
   // Loading States
-  if (loading) {
+  if (mediaLoading || newsLoading) {
     return <Loading />;
   }
 
@@ -168,6 +214,14 @@ const SubmittedNews = ({ navigation }) => {
         cb={(type = undefined) => {
           switch (type) {
             case ACTIONS.view:
+              navigation.navigate("SingleNews", {
+                newsId: activeCard,
+                media: true,
+              });
+              setActiveCard();
+              break;
+
+            case ACTIONS.pay:
               navigation.navigate("SingleNews", {
                 newsId: activeCard,
                 media: true,

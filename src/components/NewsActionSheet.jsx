@@ -105,8 +105,6 @@ const NewsActionSheet = React.forwardRef(
     };
 
     const handlePayment = ({ type, amount, currency, refNumber, mode }) => {
-      cb();
-
       const newsId = newsItem;
 
       setModalVisible((prev) => !prev);
@@ -124,7 +122,23 @@ const NewsActionSheet = React.forwardRef(
           mode,
           refNumber,
         },
-      });
+      }).then(() =>
+        Alert.alert("Success!", `Payment Successfull`, [
+          {
+            text: "Cancel",
+            onPress: () => {
+              cb((type = ACTIONS.pay));
+            },
+            style: "cancel",
+          },
+          {
+            text: "OK",
+            onPress: () => {
+              cb((type = ACTIONS.pay));
+            },
+          },
+        ])
+      );
     };
 
     // Handle News Actions

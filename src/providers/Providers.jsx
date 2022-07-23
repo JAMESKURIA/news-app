@@ -70,6 +70,7 @@ const Providers = () => {
       {rank.toLowerCase() === "guest" && <AuthStack />}
       {rank.toLowerCase() === "customer" && <CustomerTabs />}
       {rank.toLowerCase() === "media" && <MediaTabs />}
+      {rank.toLowerCase() === "super-admin" && <MediaTabs />}
     </StateContext.Provider>
   );
 };

@@ -1,6 +1,8 @@
 import { createStackNavigator } from "@react-navigation/stack";
 import useUser from "../../hooks/useUser";
 import {
+  AddMediaAdmin,
+  AddMediaStation,
   Earnings,
   PersonalNews,
   Profile,
@@ -37,6 +39,15 @@ const AccountStack = () => {
       )}
 
       <Stack.Screen name="SingleNews" component={SingleNews} />
+
+      {/* ADmin */}
+
+      {rank === "super-admin" && (
+        <Stack.Screen name="AddMediaAdmin" component={AddMediaAdmin} />
+      )}
+      {rank === "super-admin" && (
+        <Stack.Screen name="AddMediaStation" component={AddMediaStation} />
+      )}
     </Stack.Navigator>
   );
 };

@@ -10,16 +10,20 @@ const NewsStack = () => {
   return (
     <Stack.Navigator
       initialRouteName={
-        rank.toLowerCase() === "media" ? "SubmittedNews" : "PersonalNews"
+        rank.toLowerCase() === "media" || rank.toLowerCase() === "super-admin"
+          ? "SubmittedNews"
+          : "PersonalNews"
       }
       screenOptions={{
         headerShown: false,
       }}
     >
-      {rank.toLowerCase() === "media" && (
+      {(rank.toLowerCase() === "media" ||
+        rank.toLowerCase() === "super-admin") && (
         <Stack.Screen name="SubmittedNews" component={SubmittedNews} />
       )}
-      {rank.toLowerCase() === "media" && (
+      {(rank.toLowerCase() === "media" ||
+        rank.toLowerCase() === "super-admin") && (
         <Stack.Screen name="SingleNews" component={SingleNews} />
       )}
 

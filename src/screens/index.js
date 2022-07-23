@@ -1,3 +1,6 @@
+// Super Admin
+export { default as AddMediaAdmin } from "./admin/AddMediaAdmin";
+export { default as AddMediaStation } from "./admin/AddMediaStation";
 // Auth
 export { default as Login } from "./auth/Login";
 export { default as Register } from "./auth/Register";

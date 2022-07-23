@@ -4,16 +4,26 @@ import useAuth from "../../hooks/useAuth";
 import useUser from "../../hooks/useUser";
 import { COLORS } from "../../resources";
 
-const ListItem = ({ text, onPress }) => {
+const ListItem = ({ text, subtext, onPress }) => {
   return (
     <TouchableOpacity style={tw`py-1 `} onPress={onPress}>
       <Text
         style={[
-          tw`p-3 text-lg ${text.toLowerCase() === "logout" && "text-red-500"}`,
+          tw`text-lg px-2 pt-2 ${
+            text.toLowerCase() === "logout" && "text-red-500"
+          }`,
           { backgroundColor: COLORS.color_accent_dark },
         ]}
       >
         {text}
+      </Text>
+      <Text
+        style={[
+          tw`text-xs px-2 pb-2`,
+          { backgroundColor: COLORS.color_accent_dark },
+        ]}
+      >
+        {subtext}
       </Text>
     </TouchableOpacity>
   );
@@ -31,10 +41,24 @@ const Settings = ({ navigation }) => {
       ]}
     >
       <ListItem
-        text="Update Profile"
+        text="Profile"
+        subtext={"update your personal details"}
         onPress={() => navigation.navigate("Profile")}
       />
-      {rank.toLowerCase() !== "customer" && <ListItem text="Print Receipts" />}
+      {rank === "super-admin" && (
+        <ListItem
+          text="New Station"
+          subtext={"add a new media station"}
+          onPress={() => navigation.navigate("AddMediaStation")}
+        />
+      )}
+      {rank === "super-admin" && (
+        <ListItem
+          text="Media Admin"
+          subtext={"add media station admin"}
+          onPress={() => navigation.navigate("AddMediaAdmin")}
+        />
+      )}
       {rank.toLowerCase() === "customer" && (
         <ListItem
           text="My News"
@@ -51,7 +75,11 @@ const Settings = ({ navigation }) => {
           onPress={() => navigation.navigate("Earnings")}
         />
       )}
-      <ListItem text="Logout" onPress={async () => await signout()} />
+      <ListItem
+        text="Logout"
+        subtext={"sign out of your account"}
+        onPress={async () => await signout()}
+      />
     </View>
   );
 };
