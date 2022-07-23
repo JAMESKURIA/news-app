@@ -1,7 +1,9 @@
 import { gql, useQuery } from "@apollo/client";
+import * as Print from "expo-print";
 import React from "react";
-import { Alert, ScrollView, Text, View } from "react-native";
+import { Alert, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import tw from "tailwind-react-native-classnames";
+import { pdfHtml } from "../../../pdf";
 import { Loading } from "../../components";
 import useCustomer from "../../hooks/useCustomer";
 import { COLORS } from "../../resources";
@@ -55,6 +57,7 @@ const Earnings = () => {
 
   const [totalEarnings, setTotalEarnings] = React.useState(0);
   const [payments, setPayments] = React.useState([]);
+  const [pdfLoading, setPdfLoading] = React.useState(false);
 
   const totalE = payments.reduce((acc, value) => {
     return acc + parseFloat(value.amount);
@@ -85,6 +88,19 @@ const Earnings = () => {
     }
   }, [data]);
 
+  // Print Receipts
+  const print = async () => {
+    setPdfLoading(true);
+
+    // pdfHtml(values.user_image);
+
+    await Print.printAsync({
+      html: pdfHtml(payments),
+    });
+
+    setPdfLoading(false);
+  };
+
   if (error) {
     console.log("Error fetching payments: ", error);
     Alert.alert("Error", "Some error occurred while fetching payments");
@@ -92,11 +108,25 @@ const Earnings = () => {
   if (loading) {
     return <Loading message="fetching payments..." />;
   }
+
+  if (pdfLoading) {
+    return <Loading message="generating report..." />;
+  }
   return (
     <>
       <View
         style={[
-          tw`h-48 items-center justify-center `,
+          tw`items-end p-4 z-10`,
+          { backgroundColor: COLORS.color_accent_dark },
+        ]}
+      >
+        <TouchableOpacity style={tw`rounded p-2 bg-blue-50 `} onPress={print}>
+          <Text>Receipt</Text>
+        </TouchableOpacity>
+      </View>
+      <View
+        style={[
+          tw`h-48 items-center justify-center -mt-6`,
           { backgroundColor: COLORS.color_accent_dark },
         ]}
       >

@@ -16,3 +16,5 @@ web-build/
 toDelete.txt
 .yarn
 hasura
+yarn.lock
+.yarnrc.yml
