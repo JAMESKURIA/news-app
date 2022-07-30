@@ -15,7 +15,7 @@ export const pdfHtml = (payments) => {
     />
   </head>
   <body>
-    <main class="bg-gray-50 w-5/6 mx-auto py-10 px-2">
+    <main class=" w-5/6 mx-auto py-10 px-2">
       <h2 class="text-xl font-bold">News Report</h2>
       <h3 class="text-sm pt-2 text-gray-500">My Earnings</h3>
 
@@ -36,10 +36,20 @@ export const pdfHtml = (payments) => {
     console.log(payment);
     body += `
     
-    <div class="pt-4">
-          <h3>${payment.station.name}</h3>
+    <div class="pt-6">
+          <h2 class="pb-2 text-sm text-gray-800">News ${payment.id}/${
+      payment.date.split("-")[0]
+    }</h2>
+          <div class="flex justify-between ">
+            <h3>${payment.station.name}</h3>
+            <h3>Ref No: <span class="uppercase text-sm text-gray-600">${
+              payment.paymentRef
+            }</span></h3>
+          </div>
           <div class="flex justify-between text-sm">
-            <h4><span class="capitalize">${payment.currency}</span>&nbsp;<span>${payment.amount}</span></h4>
+            <h4><span class="capitalize">${
+              payment.currency
+            }</span>&nbsp;<span>${payment.amount}</span></h4>
             <span class="text-xs">${payment.date}</span>
           </div>
         </div>

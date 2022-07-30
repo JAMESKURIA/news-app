@@ -21,6 +21,7 @@ const MediaTabs = () => {
         activeTintColor: COLORS.color_light_dark,
         inactiveTintColor: COLORS.color_dark_accent,
       }}
+      initialRouteName="Home"
     >
       <Tab.Screen
         name="Home"

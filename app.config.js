@@ -2,8 +2,8 @@ import "dotenv/config";
 
 export default {
   expo: {
-    name: "peter-news-app",
-    slug: "peter-news-app",
+    name: "news-app",
+    slug: "news-app",
     version: "1.0.0",
     orientation: "portrait",
     icon: "./assets/icon.png",
@@ -38,5 +38,9 @@ export default {
       x_hasura_admin_secret: process.env.X_HASURA_ADMIN_SECRET,
     },
     description: "",
+    android: {
+      package: "com.jalysoft.news_app",
+      versionCode: 1,
+    },
   },
 };

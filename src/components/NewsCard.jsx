@@ -10,12 +10,15 @@ const NewsCard = ({ type = "customer", onPress, style, data }) => {
     <TouchableOpacity
       onPress={onPress}
       style={[
-        tw`flex-row justify-between shadow p-3 rounded my-2`,
+        tw`flex-row justify-between shadow p-3 rounded my-2 items-center`,
         { backgroundColor: COLORS.color_accent_dark },
         { ...style },
       ]}
     >
       <View style={tw`w-2/3 `}>
+        <Text style={tw`leading-6 text-xs font-medium uppercase text-gray-500`}>
+          {data?.station}
+        </Text>
         <Text style={tw`leading-6 text-lg font-semibold`}>{title}</Text>
         <Text style={tw`leading-5 py-2`} numberOfLines={2}>
           {desc}

@@ -4,7 +4,7 @@ import React from "react";
 import { Alert, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import tw from "tailwind-react-native-classnames";
 import { pdfHtml } from "../../../pdf";
-import { Loading } from "../../components";
+import { Loading, TopNav } from "../../components";
 import useCustomer from "../../hooks/useCustomer";
 import { COLORS } from "../../resources";
 
@@ -49,7 +49,7 @@ const Payment = ({ station, amount, currency, ...props }) => {
   );
 };
 
-const Earnings = () => {
+const Earnings = ({ navigation }) => {
   const { customer_id: customerId } = useCustomer();
   const { loading, error, data } = useQuery(FETCH_PAYMENTS, {
     variables: { customerId },
@@ -84,7 +84,7 @@ const Earnings = () => {
 
       setPayments([..._paymData]);
 
-      console.log(_paymData);
+      // console.log(_paymData);
     }
   }, [data]);
 
@@ -114,6 +114,13 @@ const Earnings = () => {
   }
   return (
     <>
+      {/* Navigation */}
+      <View style={tw` pt-4  w-full`}>
+        <TopNav
+          pageName={"My Earnings"}
+          handleGoBack={() => navigation.goBack()}
+        />
+      </View>
       <View
         style={[
           tw`items-end p-4 z-10`,

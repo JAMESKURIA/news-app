@@ -1,14 +1,21 @@
-import { View, Text, ScrollView, TouchableOpacity } from "react-native";
-import tw from "tailwind-react-native-classnames";
+import { ScrollView, Text, View } from "react-native";
 import Icon from "react-native-dynamic-vector-icons";
-import { COLORS } from "../../resources";
 import { OutlinedTextField } from "rn-material-ui-textfield";
-import { Button } from "../../components";
+import tw from "tailwind-react-native-classnames";
+import { Button, TopNav } from "../../components";
+import { COLORS } from "../../resources";
 
 const FONT_SIZE = 17;
-const Profile = () => {
+const Profile = ({ navigation }) => {
   return (
     <ScrollView style={tw`flex-1`}>
+      {/* Navigation */}
+      <View style={tw` pt-4  w-full`}>
+        <TopNav
+          pageName={"My Profile"}
+          handleGoBack={() => navigation.goBack()}
+        />
+      </View>
       <View style={tw`p-3`}>
         {/* Actions */}
         <View style={tw`flex-row justify-between items-center pb-4`}>

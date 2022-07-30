@@ -55,6 +55,10 @@ const FETCH_ALL_NEWS = gql`
         news_verify_id
         news_verify_status
       }
+      media_station {
+        media_station_id
+        media_station_name
+      }
     }
   }
 `;
@@ -191,6 +195,7 @@ const SubmittedNews = ({ navigation }) => {
               desc: n.customer_news_desc,
               image: n.customer_files[0].customer_file_attachment,
               status: n?.news_verifies[0]?.news_verify_status,
+              station: n?.media_station?.media_station_name,
             };
 
             return (

@@ -161,7 +161,7 @@ const SingleNews = ({ navigation, route }) => {
                   style={tw`py-3`}
                 >
                   {videos?.map((video) => (
-                    <View key={video.customer_file_id}>
+                    <View key={video.customer_file_id} style={tw`mr-2`}>
                       <Image
                         source={{
                           uri: video.customer_file_attachment,

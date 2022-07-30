@@ -62,6 +62,7 @@ const Settings = ({ navigation }) => {
       {rank.toLowerCase() === "customer" && (
         <ListItem
           text="My News"
+          subtext={"view personal uploaded news"}
           onPress={() =>
             rank.toLowerCase() === "customer"
               ? navigation.navigate("PersonalNews")
@@ -72,6 +73,7 @@ const Settings = ({ navigation }) => {
       {rank.toLowerCase() === "customer" && (
         <ListItem
           text="My Earnings"
+          subtext={"view earnings and print receipts"}
           onPress={() => navigation.navigate("Earnings")}
         />
       )}

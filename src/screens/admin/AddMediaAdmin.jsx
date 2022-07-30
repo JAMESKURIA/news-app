@@ -1,10 +1,10 @@
 import { gql, useMutation } from "@apollo/client";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import React from "react";
-import { Alert, Dimensions, ScrollView, Text, View } from "react-native";
+import { Alert, Dimensions, ScrollView, View } from "react-native";
 import { TextField } from "rn-material-ui-textfield";
 import tw from "tailwind-react-native-classnames";
-import { Button, Loading } from "../../components";
+import { Button, Loading, TopNav } from "../../components";
 import { auth } from "../../config/firebase";
 
 const { width } = Dimensions.get("screen");
@@ -39,7 +39,7 @@ const CREATE_MEDIA_ADMIN = gql`
   }
 `;
 
-const AddMediaAdmin = () => {
+const AddMediaAdmin = ({ navigation }) => {
   const [fname, setFname] = React.useState(null);
   const [lname, setLname] = React.useState(null);
   const [username, setUsername] = React.useState(null);
@@ -137,10 +137,17 @@ const AddMediaAdmin = () => {
 
   return (
     <ScrollView showsVerticalScrollIndicator={false}>
+      {/* Navigation */}
+      <View style={tw` pt-4  w-full`}>
+        <TopNav
+          pageName={"Add A Media Admin"}
+          handleGoBack={() => navigation.goBack()}
+        />
+      </View>
       <View style={tw`flex-1 p-4`}>
-        <View style={tw`pt-4 pb-5`}>
+        {/* <View style={tw`pt-4 pb-5`}>
           <Text style={tw`text-center text-xl`}>Add A Media Admin</Text>
-        </View>
+        </View> */}
 
         {/* Username */}
         <TextField

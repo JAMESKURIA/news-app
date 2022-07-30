@@ -4,10 +4,10 @@ import { Alert, Dimensions, ScrollView, Text, View } from "react-native";
 import DropDownPicker from "react-native-dropdown-picker";
 import { TextField } from "rn-material-ui-textfield";
 import tw from "tailwind-react-native-classnames";
-import { Button, Loading } from "../../components";
+import { Button, Loading, TopNav } from "../../components";
 import { COLORS } from "../../resources";
 
-const { width } = Dimensions.get("screen");
+const { width, height } = Dimensions.get("screen");
 
 const CREATE_MEDIA_STATION = gql`
   mutation insertStation(
@@ -41,7 +41,7 @@ const GET_ADMINS = gql`
   }
 `;
 
-const AddMediaStation = () => {
+const AddMediaStation = ({ navigation }) => {
   const [name, setName] = React.useState(null);
   const [email, setEmail] = React.useState(null);
   const [country, setCountry] = React.useState(null);
@@ -64,7 +64,7 @@ const AddMediaStation = () => {
 
   React.useEffect(() => {
     if (adminData) {
-      console.log("Admin data: ", adminData);
+      // console.log("Admin data: ", adminData);
 
       setItems(
         adminData.media_admin.map((admin) => ({
@@ -116,12 +116,23 @@ const AddMediaStation = () => {
     return <Loading />;
   }
 
+  const styles = () => {
+    return open ? { height: height } : {};
+  };
+
   return (
-    <ScrollView showsVerticalScrollIndicator={false}>
-      <View style={tw`flex-1 p-4`}>
-        <View style={tw`pt-4 pb-5`}>
+    <ScrollView style={tw`flex-1`} showsVerticalScrollIndicator={false}>
+      {/* Navigation */}
+      <View style={tw` pt-4  w-full`}>
+        <TopNav
+          pageName={"Add A Media Station"}
+          handleGoBack={() => navigation.goBack()}
+        />
+      </View>
+      <View style={[tw`flex-1 p-4`, { ...styles() }]}>
+        {/* <View style={tw`pt-4 pb-5`}>
           <Text style={tw`text-center text-xl`}>Add A Media Station</Text>
-        </View>
+        </View> */}
         {/* Station Name */}
         <TextField
           label="Station Name"
@@ -168,7 +179,7 @@ const AddMediaStation = () => {
           <Text style={tw` pb-4 text-gray-800`}>
             Choose media station admin
           </Text>
-          <View>
+          <View style={tw`flex-1 `}>
             <DropDownPicker
               placeholder="select station admin"
               open={open}
@@ -179,7 +190,7 @@ const AddMediaStation = () => {
               setItems={setItems}
               style={{
                 borderColor: COLORS.color_primary_dark,
-                // backgroundColor: COLORS.color_primary_dark,  fc
+                // backgroundColor: COLORS.color_primary_dark,
               }}
               searchable={true}
             />
@@ -187,7 +198,7 @@ const AddMediaStation = () => {
         </View>
 
         {/* Register button */}
-        <View style={[tw`py-4 self-center`, { width: width / 1.4 }]}>
+        <View style={[tw`py-4 mt-4 self-center`, { width: width / 1.4 }]}>
           <Button
             text="Add Station"
             // color={COLORS.color_light_dark}
