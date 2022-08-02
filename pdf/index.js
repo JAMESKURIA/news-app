@@ -1,4 +1,4 @@
-export const pdfHtml = (payments) => {
+export const pdfHtml = (customer, payments) => {
   const header = `
   <html lang="en">
   <head>
@@ -17,7 +17,14 @@ export const pdfHtml = (payments) => {
   <body>
     <main class=" w-5/6 mx-auto py-10 px-2">
       <h2 class="text-xl font-bold">News Report</h2>
-      <h3 class="text-sm pt-2 text-gray-500">My Earnings</h3>
+      <div class="flex justify-between items-end pt-6">
+        <div>
+          <h2 class="text-lg uppercase font-semibold text-gray-600">${customer.name}</h2>
+          <h2 class="text-xs font-medium text-gray-500">${customer.email}</h2>
+        </div>
+
+        <h3 class="text-sm pt-2 text-gray-500">My Earnings</h3>
+      </div>
 
       <section class="pt-6">
   `;
@@ -33,7 +40,7 @@ export const pdfHtml = (payments) => {
   let body = ``;
 
   payments.forEach((payment) => {
-    console.log(payment);
+    // console.log(payment);
     body += `
     
     <div class="pt-6">

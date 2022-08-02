@@ -1,4 +1,4 @@
-import { gql, useQuery } from "@apollo/client";
+import { gql, useLazyQuery } from "@apollo/client";
 import * as Print from "expo-print";
 import React from "react";
 import { Alert, ScrollView, Text, TouchableOpacity, View } from "react-native";
@@ -9,13 +9,18 @@ import useCustomer from "../../hooks/useCustomer";
 import { COLORS } from "../../resources";
 
 const FETCH_PAYMENTS = gql`
-  query getPayments($customerId: Int) {
+  query getPayments($customerId: Int!) {
+    customer(where: { customer_id: { _eq: $customerId } }) {
+      customer_id
+      customer_name
+      customer_email
+    }
+
     payments(
       where: {
-        media_admin: {
-          news_verifies: {
-            customer_new: { customer_news_customer_id: { _eq: $customerId } }
-          }
+        customer_new: {
+          news_verifies: { news_verify_status: { _eq: "paid" } }
+          customer_news_customer_id: { _eq: $customerId }
         }
       }
     ) {
@@ -25,8 +30,8 @@ const FETCH_PAYMENTS = gql`
       payments_date
       payments_mode
       payment_currency_type
-      media_admin {
-        media_stations {
+      customer_new {
+        media_station {
           media_station_id
           media_station_name
         }
@@ -51,17 +56,26 @@ const Payment = ({ station, amount, currency, ...props }) => {
 
 const Earnings = ({ navigation }) => {
   const { customer_id: customerId } = useCustomer();
-  const { loading, error, data } = useQuery(FETCH_PAYMENTS, {
-    variables: { customerId },
-  });
+
+  const [getEarnings, { loading, error, data }] = useLazyQuery(FETCH_PAYMENTS);
 
   const [totalEarnings, setTotalEarnings] = React.useState(0);
   const [payments, setPayments] = React.useState([]);
+  const [customer, setCustomer] = React.useState();
   const [pdfLoading, setPdfLoading] = React.useState(false);
 
   const totalE = payments.reduce((acc, value) => {
     return acc + parseFloat(value.amount);
   }, 0);
+
+  React.useEffect(() => {
+    if (customerId) {
+      getEarnings({
+        variables: { customerId },
+        fetchPolicy: "network-only",
+      });
+    }
+  }, [customerId]);
 
   React.useEffect(() => {
     setTotalEarnings(totalE);
@@ -77,12 +91,19 @@ const Earnings = ({ navigation }) => {
         date: paym.payments_date,
         mode: paym.payments_mode,
         station: {
-          id: paym.media_admin.media_stations[0].media_station_id,
-          name: paym.media_admin.media_stations[0].media_station_name,
+          id: paym.customer_new.media_station.media_station_id,
+          name: paym.customer_new.media_station.media_station_name,
         },
       }));
 
+      const _customer = data.customer[0];
+
       setPayments([..._paymData]);
+      setCustomer({
+        id: _customer.customer_id,
+        name: _customer.customer_name,
+        email: _customer.customer_email,
+      });
 
       // console.log(_paymData);
     }
@@ -95,7 +116,7 @@ const Earnings = ({ navigation }) => {
     // pdfHtml(values.user_image);
 
     await Print.printAsync({
-      html: pdfHtml(payments),
+      html: pdfHtml(customer, payments),
     });
 
     setPdfLoading(false);
@@ -149,7 +170,7 @@ const Earnings = ({ navigation }) => {
       <View style={[tw`flex-1`, { backgroundColor: COLORS.color_light_dark }]}>
         <ScrollView>
           <View style={tw`p-6`}>
-            <Text
+            {/* <Text
               style={[
                 tw`text-center leading-6`,
                 { color: COLORS.color_dark_accent },
@@ -157,7 +178,7 @@ const Earnings = ({ navigation }) => {
             >
               Lorem ipsum, dolor sit amet consectetur adipisicing elit. Ex, est
               numquam incidunt.
-            </Text>
+            </Text> */}
             <View style={[tw`pt-3`]}>
               <Payment
                 currency={""}
