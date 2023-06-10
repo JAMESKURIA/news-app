@@ -18,3 +18,4 @@ toDelete.txt
 hasura
 yarn.lock
 .yarnrc.yml
+/.env
